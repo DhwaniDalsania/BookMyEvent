@@ -343,7 +343,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   },
                 ),
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (_, __) => const SizedBox.shrink(),
+                error: (_, _) => const SizedBox.shrink(),
               ),
             ),
           ),

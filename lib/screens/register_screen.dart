@@ -27,6 +27,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _organizerNameController = TextEditingController();
   bool _isPasswordVisible = false;
   String _selectedRole = 'USER';
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -64,6 +65,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       return;
     }
 
+    setState(() => _isSubmitting = true);
     try {
       await ref.read(authProvider.notifier).register(
             firstName: first,
@@ -92,13 +94,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           SnackBar(content: Text(message)),
         );
       }
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
-    final isLoading = authState is AsyncLoading;
+    final isLoading = _isSubmitting;
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Stack(

@@ -121,6 +121,12 @@ let PaymentsService = class PaymentsService {
             .update(body.toString())
             .digest('hex');
         if (expectedSignature !== dto.razorpaySignature) {
+            console.error('--- Signature Verification Mismatch ---');
+            console.error('Body (orderId|paymentId):', body);
+            console.error('Expected Signature (calculated):', expectedSignature);
+            console.error('Received Signature (from client):', dto.razorpaySignature);
+            console.error('Loaded secret length:', process.env.RAZORPAY_KEY_SECRET?.length || 0);
+            console.error('--------------------------------------');
             throw new common_1.BadRequestException('Invalid Signature');
         }
         await this.prisma.payment.update({

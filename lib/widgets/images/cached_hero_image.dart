@@ -70,7 +70,7 @@ class CachedHeroImage extends StatelessWidget {
             height: height,
             fit: fit,
             color: color,
-            errorBuilder: (_, __, ___) => _buildPlaceholder(),
+            errorBuilder: (_, _, _) => _buildPlaceholder(),
           );
         }
         return _buildPlaceholder();

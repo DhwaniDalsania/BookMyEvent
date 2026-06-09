@@ -7,24 +7,24 @@ export declare class SeatHoldsService {
         id: string;
         userId: string;
         eventId: string;
-        seatId: string;
         bookingId: string | null;
+        seatId: string;
         expiresAt: Date;
     }>;
     removeHold(userId: string, id: string): Promise<{
         id: string;
         userId: string;
         eventId: string;
-        seatId: string;
         bookingId: string | null;
+        seatId: string;
         expiresAt: Date;
     }>;
     getActiveHoldsForEvent(eventId: string): Promise<{
         id: string;
         userId: string;
         eventId: string;
-        seatId: string;
         bookingId: string | null;
+        seatId: string;
         expiresAt: Date;
     }[]>;
 }

@@ -126,7 +126,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                           child: Image.network(
                             url,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const Icon(Icons.person),
+                            errorBuilder: (_, _, _) => const Icon(Icons.person),
                           ),
                         ),
                       ),

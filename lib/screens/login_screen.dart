@@ -27,6 +27,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _phoneController = TextEditingController();
+  bool _isSubmitting = false;
 
 
   @override
@@ -45,6 +46,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     if (email.isEmpty || password.isEmpty) return;
 
+    setState(() => _isSubmitting = true);
     try {
       if (!_isRegistering) {
         await ref.read(authProvider.notifier).login(email, password);
@@ -75,13 +77,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           SnackBar(content: Text(message)),
         );
       }
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
-    final isLoading = authState is AsyncLoading;
+    final isLoading = _isSubmitting;
 
     return Scaffold(
       backgroundColor: AppColors.background,

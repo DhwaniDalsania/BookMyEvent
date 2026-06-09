@@ -27,7 +27,7 @@ class ProfileScreen extends ConsumerWidget {
       backgroundColor: AppColors.background,
       body: authAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('Failed to load profile')),
+        error: (_, _) => const Center(child: Text('Failed to load profile')),
         data: (user) {
           final upcomingCount = bookingsAsync.value
                   ?.where((b) => b.status == 'CONFIRMED' || b.status == 'PENDING')
@@ -371,7 +371,7 @@ class ProfileScreen extends ConsumerWidget {
                               child: Image.network(
                                 url,
                                 fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => const Icon(Icons.person),
+                                errorBuilder: (_, _, _) => const Icon(Icons.person),
                               ),
                             ),
                           ),

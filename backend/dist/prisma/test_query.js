@@ -3,23 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 async function main() {
-    const events = await prisma.event.findMany({
-        where: {
-            title: 'rahul ji'
-        },
+    const payments = await prisma.payment.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 5,
         include: {
-            ticketTiers: true,
+            booking: true,
         }
     });
-    if (events.length > 0) {
-        const event = events[0];
-        console.log('Event Name:', event.title);
-        console.log('Raw ticketTiers:', event.ticketTiers);
-        console.log('JSON serialized ticketTiers:', JSON.stringify(event.ticketTiers));
-    }
-    else {
-        console.log('No event found with title "rahul ji"');
-    }
+    console.log('Recent Payments:', JSON.stringify(payments, null, 2));
 }
 main().catch(console.error).finally(() => prisma.$disconnect());
 //# sourceMappingURL=test_query.js.map

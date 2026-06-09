@@ -8,24 +8,24 @@ export declare class SeatHoldsController {
         id: string;
         userId: string;
         eventId: string;
-        seatId: string;
         bookingId: string | null;
+        seatId: string;
         expiresAt: Date;
     }>;
     remove(id: string, req: AuthenticatedRequest): Promise<{
         id: string;
         userId: string;
         eventId: string;
-        seatId: string;
         bookingId: string | null;
+        seatId: string;
         expiresAt: Date;
     }>;
     getEventHolds(eventId: string): Promise<{
         id: string;
         userId: string;
         eventId: string;
-        seatId: string;
         bookingId: string | null;
+        seatId: string;
         expiresAt: Date;
     }[]>;
 }

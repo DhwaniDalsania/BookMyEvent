@@ -1,7 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../../providers/performance_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class GlassButton extends StatelessWidget {
+class GlassButton extends ConsumerWidget {
   final IconData icon;
   final VoidCallback onTap;
   final double size;
@@ -16,7 +18,7 @@ class GlassButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -39,12 +41,16 @@ class GlassButton extends StatelessWidget {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(size / 2),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Center(
-              child: Icon(icon, color: Colors.white, size: iconSize),
-            ),
-          ),
+          child: ref.watch(performanceProvider)
+              ? BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Center(
+                    child: Icon(icon, color: Colors.white, size: iconSize),
+                  ),
+                )
+              : Center(
+                  child: Icon(icon, color: Colors.white, size: iconSize),
+                ),
         ),
       ),
     );
