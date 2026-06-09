@@ -19,7 +19,7 @@ export class BookingsService {
   }
 
   async create(userId: string, dto: CreateBookingDto) {
-    let totalAmount = 0;
+    let ticketPrice = 0;
 
     // 1. Verify holds and calculate price
     for (const req of dto.tickets) {
@@ -36,9 +36,12 @@ export class BookingsService {
         where: { id: req.ticketTierId },
       });
       if (!tier) throw new NotFoundException('Ticket tier not found');
-      totalAmount += Number(tier.price);
+      ticketPrice += Number(tier.price);
     }
 
+    const bookingFee = 99.0;
+    const platformFee = 49.0;
+    const totalAmount = ticketPrice + bookingFee + platformFee;
     const finalAmount = totalAmount - (dto.discountAmount || 0);
 
     // 2. Create Booking

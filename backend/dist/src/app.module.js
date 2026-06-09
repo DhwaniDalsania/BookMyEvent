@@ -9,6 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const schedule_1 = require("@nestjs/schedule");
+const config_1 = require("@nestjs/config");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const auth_module_1 = require("./auth/auth.module");
@@ -25,12 +26,14 @@ const wishlist_module_1 = require("./wishlist/wishlist.module");
 const reviews_module_1 = require("./reviews/reviews.module");
 const notifications_module_1 = require("./notifications/notifications.module");
 const analytics_module_1 = require("./analytics/analytics.module");
+const uploads_module_1 = require("./uploads/uploads.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            config_1.ConfigModule.forRoot({ isGlobal: true }),
             schedule_1.ScheduleModule.forRoot(),
             auth_module_1.AuthModule,
             prisma_module_1.PrismaModule,
@@ -46,6 +49,7 @@ exports.AppModule = AppModule = __decorate([
             reviews_module_1.ReviewsModule,
             notifications_module_1.NotificationsModule,
             analytics_module_1.AnalyticsModule,
+            uploads_module_1.UploadsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

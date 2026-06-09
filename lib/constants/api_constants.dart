@@ -8,4 +8,12 @@ class ApiConstants {
     }
     return 'https://bookmyevent-4rrq.onrender.com';
   }
+
+  static String getFullImageUrl(String? url) {
+    if (url == null || url.isEmpty) return '';
+    if (url.startsWith('/uploads')) {
+      return '$baseUrl$url';
+    }
+    return url;
+  }
 }

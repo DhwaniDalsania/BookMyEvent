@@ -12,6 +12,8 @@ import '../../providers/event_provider.dart';
 import '../../providers/organizer_provider.dart';
 import '../../utils/error_handler.dart';
 import 'dart:ui';
+import 'package:image_picker/image_picker.dart';
+import '../../data/repositories/upload_repository.dart';
 
 class CreateEventScreen extends ConsumerStatefulWidget {
   final EventModel? event;
@@ -287,8 +289,41 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                       _buildGlassTextField('Ticket Price (₹)', '999', Icons.confirmation_number,
                           controller: _priceController, keyboardType: TextInputType.number),
                       const SizedBox(height: 16),
-                      _buildGlassTextField('Banner Image URL', 'https://...', Icons.image,
-                          controller: _imageUrlController),
+                      _buildGlassTextField(
+                        'Banner Image URL',
+                        'https://...',
+                        Icons.image,
+                        controller: _imageUrlController,
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.photo_library, color: AppColors.gold),
+                          onPressed: () async {
+                            final ImagePicker picker = ImagePicker();
+                            final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+                            if (image != null) {
+                              try {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Uploading cover image...')),
+                                );
+                                final uploadedUrl = await UploadRepository().uploadImage(image);
+                                setState(() {
+                                  _imageUrlController.text = uploadedUrl;
+                                });
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Cover image uploaded successfully!')),
+                                  );
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Failed to upload image: $e')),
+                                  );
+                                }
+                              }
+                            }
+                          },
+                        ),
+                      ),
                       const SizedBox(height: 16),
                       _buildGlassTextField('Description', 'What is this event about?', Icons.description,
                           controller: _descriptionController, maxLines: 4),
@@ -375,6 +410,7 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
     required TextEditingController controller,
     int maxLines = 1,
     TextInputType? keyboardType,
+    Widget? suffixIcon,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -400,6 +436,7 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                   hintText: hint,
                   hintStyle: AppTextStyles.bodyCopy.copyWith(color: AppColors.mountain.withValues(alpha: 0.5)),
                   prefixIcon: maxLines == 1 ? Icon(icon, color: AppColors.gold, size: 20) : null,
+                  suffixIcon: suffixIcon,
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 ),

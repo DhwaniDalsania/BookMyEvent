@@ -24,7 +24,7 @@ let BookingsService = class BookingsService {
         return 'BME-' + Math.random().toString(36).substring(2, 10).toUpperCase();
     }
     async create(userId, dto) {
-        let totalAmount = 0;
+        let ticketPrice = 0;
         for (const req of dto.tickets) {
             const hold = await this.prisma.seatHold.findUnique({
                 where: { eventId_seatId: { eventId: dto.eventId, seatId: req.seatId } },
@@ -37,8 +37,11 @@ let BookingsService = class BookingsService {
             });
             if (!tier)
                 throw new common_1.NotFoundException('Ticket tier not found');
-            totalAmount += Number(tier.price);
+            ticketPrice += Number(tier.price);
         }
+        const bookingFee = 99.0;
+        const platformFee = 49.0;
+        const totalAmount = ticketPrice + bookingFee + platformFee;
         const finalAmount = totalAmount - (dto.discountAmount || 0);
         const booking = await this.prisma.booking.create({
             data: {

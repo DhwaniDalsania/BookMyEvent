@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import '../widgets/buttons/primary_button.dart';
-import 'package:dio/dio.dart';
 import '../providers/auth_provider.dart';
 import '../utils/error_handler.dart';
 import 'main_layout.dart';

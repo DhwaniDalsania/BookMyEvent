@@ -1,3 +1,5 @@
+import '../../constants/api_constants.dart';
+
 class EventModel {
   final String id;
   final String title;
@@ -51,7 +53,7 @@ class EventModel {
       description: json['description'] ?? '',
       startTime: json['startTime'] != null ? DateTime.parse(json['startTime']) : DateTime.now(),
       endTime: json['endTime'] != null ? DateTime.parse(json['endTime']) : DateTime.now(),
-      heroImageUrl: json['heroImageUrl'],
+      heroImageUrl: ApiConstants.getFullImageUrl(json['heroImageUrl']),
       status: json['status'],
       categoryId: json['categoryId'] ?? '',
       venueId: json['venueId'] ?? '',

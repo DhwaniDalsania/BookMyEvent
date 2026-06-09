@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:dio/dio.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';

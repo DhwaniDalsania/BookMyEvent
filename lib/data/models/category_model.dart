@@ -1,3 +1,5 @@
+import '../../constants/api_constants.dart';
+
 class CategoryModel {
   final String id;
   final String name;
@@ -16,7 +18,7 @@ class CategoryModel {
       id: json['id'] ?? '',
       name: json['name'] ?? '',
       slug: json['slug'] ?? '',
-      iconUrl: json['iconUrl'],
+      iconUrl: ApiConstants.getFullImageUrl(json['iconUrl']),
     );
   }
 }

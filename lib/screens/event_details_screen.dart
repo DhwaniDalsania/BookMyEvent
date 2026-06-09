@@ -13,7 +13,6 @@ import '../widgets/images/cached_hero_image.dart';
 import '../providers/event_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/wishlist_provider.dart';
-import '../data/repositories/wishlist_repository.dart';
 import 'login_screen.dart';
 import '../widgets/buttons/primary_button.dart';
 

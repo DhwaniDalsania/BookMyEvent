@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import 'dart:ui';
+import 'package:image_picker/image_picker.dart';
+import '../data/repositories/upload_repository.dart';
 import 'login_screen.dart';
 import 'profile_edit_screen.dart';
 import 'wishlist_screen.dart';
@@ -375,6 +377,34 @@ class ProfileScreen extends ConsumerWidget {
                           ),
                         );
                       },
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      final ImagePicker picker = ImagePicker();
+                      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+                      if (image != null) {
+                        try {
+                          final uploadedUrl = await UploadRepository().uploadImage(image);
+                          setModalState(() {
+                            selectedUrl = uploadedUrl;
+                            controller.text = uploadedUrl;
+                          });
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Failed to upload image: $e')),
+                          );
+                        }
+                      }
+                    },
+                    icon: const Icon(Icons.photo_library),
+                    label: const Text('Choose from Gallery'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.gold,
+                      foregroundColor: AppColors.mahogany,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      minimumSize: const Size(double.infinity, 45),
                     ),
                   ),
                   const SizedBox(height: 24),

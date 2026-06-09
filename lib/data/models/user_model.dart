@@ -1,3 +1,5 @@
+import '../../constants/api_constants.dart';
+
 class UserModel {
   final String id;
   final String firstName;
@@ -35,7 +37,7 @@ class UserModel {
       email: json['email'] ?? '',
       role: json['role'] ?? 'USER',
       phoneNumber: json['phoneNumber'],
-      profileImageUrl: json['profileImageUrl'],
+      profileImageUrl: ApiConstants.getFullImageUrl(json['profileImageUrl']),
       organizerId: organizer?['id'],
       organizerName: organizer?['name'],
       createdAt: json['createdAt'] != null ? DateTime.tryParse(json['createdAt']) : null,
@@ -55,7 +57,7 @@ class UserModel {
       email: email,
       role: role,
       phoneNumber: phoneNumber ?? this.phoneNumber,
-      profileImageUrl: profileImageUrl ?? this.profileImageUrl,
+      profileImageUrl: profileImageUrl != null ? ApiConstants.getFullImageUrl(profileImageUrl) : this.profileImageUrl,
       organizerId: organizerId,
       organizerName: organizerName,
       createdAt: createdAt,
