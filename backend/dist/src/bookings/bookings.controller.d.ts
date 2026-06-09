@@ -8,10 +8,10 @@ export declare class BookingsController {
         createdAt: Date;
         userId: string;
         status: import("@prisma/client").$Enums.BookingStatus;
+        eventId: string;
         finalAmount: import("@prisma/client/runtime/library").Decimal;
         totalAmount: import("@prisma/client/runtime/library").Decimal;
         discountAmount: import("@prisma/client/runtime/library").Decimal;
-        eventId: string;
         bookingRef: string;
     }>;
     findMyBookings(req: any): Promise<({
@@ -59,10 +59,10 @@ export declare class BookingsController {
         createdAt: Date;
         userId: string;
         status: import("@prisma/client").$Enums.BookingStatus;
+        eventId: string;
         finalAmount: import("@prisma/client/runtime/library").Decimal;
         totalAmount: import("@prisma/client/runtime/library").Decimal;
         discountAmount: import("@prisma/client/runtime/library").Decimal;
-        eventId: string;
         bookingRef: string;
     })[]>;
     findOne(id: string): Promise<({
@@ -116,10 +116,10 @@ export declare class BookingsController {
         createdAt: Date;
         userId: string;
         status: import("@prisma/client").$Enums.BookingStatus;
+        eventId: string;
         finalAmount: import("@prisma/client/runtime/library").Decimal;
         totalAmount: import("@prisma/client/runtime/library").Decimal;
         discountAmount: import("@prisma/client/runtime/library").Decimal;
-        eventId: string;
         bookingRef: string;
     }) | null>;
     cancel(id: string, req: any): Promise<{
@@ -130,10 +130,10 @@ export declare class BookingsController {
         createdAt: Date;
         userId: string;
         status: import("@prisma/client").$Enums.BookingStatus;
+        eventId: string;
         finalAmount: import("@prisma/client/runtime/library").Decimal;
         totalAmount: import("@prisma/client/runtime/library").Decimal;
         discountAmount: import("@prisma/client/runtime/library").Decimal;
-        eventId: string;
         bookingRef: string;
     }>;
 }

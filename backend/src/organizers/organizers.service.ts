@@ -82,7 +82,13 @@ export class OrganizersService {
     const organizer = await this.findOneByUserId(userId);
     const events = await this.prisma.event.findMany({
       where: { organizerId: organizer.id },
-      include: { metrics: true },
+      include: {
+        metrics: true,
+        ticketTiers: { orderBy: { price: 'asc' } },
+        venue: true,
+        category: true,
+      },
+      orderBy: { startTime: 'desc' },
     });
     const bookings = await this.prisma.booking.count({
       where: {

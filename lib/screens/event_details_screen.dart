@@ -15,6 +15,7 @@ import '../providers/auth_provider.dart';
 import '../providers/wishlist_provider.dart';
 import '../data/repositories/wishlist_repository.dart';
 import 'login_screen.dart';
+import '../widgets/buttons/primary_button.dart';
 
 class EventDetailsScreen extends ConsumerWidget {
   final EventModel event;
@@ -321,10 +322,7 @@ class EventDetailsScreen extends ConsumerWidget {
                           );
                           return;
                         }
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => SeatSelectionScreen(event: event)),
-                        );
+                        _showQuantitySelector(context, ref);
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -381,6 +379,105 @@ class EventDetailsScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void _showQuantitySelector(BuildContext context, WidgetRef ref) {
+    int quantity = 2;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.vanilla,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Select Ticket Quantity',
+                    style: AppTextStyles.sectionHeader.copyWith(color: AppColors.mahogany),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Choose how many seats you want to book for ${event.title}',
+                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mountain),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 32),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          if (quantity > 1) {
+                            setModalState(() => quantity--);
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: AppColors.gold, width: 2),
+                          ),
+                          child: const Icon(Icons.remove, color: AppColors.mahogany),
+                        ),
+                      ),
+                      const SizedBox(width: 32),
+                      Text(
+                        '$quantity',
+                        style: AppTextStyles.heroTitle.copyWith(color: AppColors.mahogany, fontSize: 36),
+                      ),
+                      const SizedBox(width: 32),
+                      GestureDetector(
+                        onTap: () {
+                          if (quantity < 10) {
+                            setModalState(() => quantity++);
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: AppColors.gold, width: 2),
+                          ),
+                          child: const Icon(Icons.add, color: AppColors.mahogany),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 40),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: PrimaryButton(
+                      text: 'Select Seats',
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => SeatSelectionScreen(
+                              event: event,
+                              ticketCount: quantity,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

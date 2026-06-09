@@ -114,6 +114,12 @@ export class UpdateEventDto {
   @IsBoolean()
   @IsOptional()
   isFeatured?: boolean;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateTicketTierDto)
+  @IsOptional()
+  ticketTiers?: CreateTicketTierDto[];
 }
 
 export class QueryEventDto {

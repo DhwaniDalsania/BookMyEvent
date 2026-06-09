@@ -49,10 +49,10 @@ export declare class TicketsController {
             createdAt: Date;
             userId: string;
             status: import("@prisma/client").$Enums.BookingStatus;
+            eventId: string;
             finalAmount: import("@prisma/client/runtime/library").Decimal;
             totalAmount: import("@prisma/client/runtime/library").Decimal;
             discountAmount: import("@prisma/client/runtime/library").Decimal;
-            eventId: string;
             bookingRef: string;
         };
     } & {
@@ -108,10 +108,10 @@ export declare class TicketsController {
             createdAt: Date;
             userId: string;
             status: import("@prisma/client").$Enums.BookingStatus;
+            eventId: string;
             finalAmount: import("@prisma/client/runtime/library").Decimal;
             totalAmount: import("@prisma/client/runtime/library").Decimal;
             discountAmount: import("@prisma/client/runtime/library").Decimal;
-            eventId: string;
             bookingRef: string;
         };
     } & {

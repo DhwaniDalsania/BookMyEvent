@@ -7,13 +7,15 @@ import '../../widgets/buttons/primary_button.dart';
 import '../../data/repositories/organizer_repository.dart';
 import '../../data/repositories/event_repository.dart';
 import '../../data/models/category_model.dart';
+import '../../data/models/event_model.dart';
 import '../../providers/event_provider.dart';
 import '../../providers/organizer_provider.dart';
 import '../../utils/error_handler.dart';
 import 'dart:ui';
 
 class CreateEventScreen extends ConsumerStatefulWidget {
-  const CreateEventScreen({super.key});
+  final EventModel? event;
+  const CreateEventScreen({super.key, this.event});
 
   @override
   ConsumerState<CreateEventScreen> createState() => _CreateEventScreenState();
@@ -39,6 +41,14 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.event != null) {
+      _titleController.text = widget.event!.title;
+      _descriptionController.text = widget.event!.description;
+      _priceController.text = widget.event!.startingPrice.toInt().toString();
+      _imageUrlController.text = widget.event!.heroImageUrl ?? '';
+      _startDate = widget.event!.startTime;
+      _startTime = TimeOfDay.fromDateTime(widget.event!.startTime);
+    }
     _loadFormData();
   }
 
@@ -56,8 +66,21 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
           _categories = results[0] as List<CategoryModel>;
           _venues = results[1] as List<Map<String, dynamic>>;
           _organizerId = (results[2] as Map<String, dynamic>)['id'] as String?;
-          _categoryId = _categories.isNotEmpty ? _categories.first.id : null;
-          _venueId = _venues.isNotEmpty ? _venues.first['id'] as String? : null;
+          
+          if (widget.event != null) {
+            _categoryId = widget.event!.categoryId;
+            if (!_categories.any((c) => c.id == _categoryId)) {
+              _categoryId = _categories.isNotEmpty ? _categories.first.id : null;
+            }
+            _venueId = widget.event!.venueId;
+            if (!_venues.any((v) => v['id'] == _venueId)) {
+              _venueId = _venues.isNotEmpty ? _venues.first['id'] as String? : null;
+            }
+          } else {
+            _categoryId = _categories.isNotEmpty ? _categories.first.id : null;
+            _venueId = _venues.isNotEmpty ? _venues.first['id'] as String? : null;
+          }
+          
           _isLoading = false;
         });
       }
@@ -118,25 +141,40 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
         _startTime.minute,
       );
       final price = double.tryParse(_priceController.text) ?? 999;
+      final ticketTiers = [
+        {'name': 'General', 'price': price, 'availableQty': 500},
+        {'name': 'Premium', 'price': price * 2, 'availableQty': 100},
+        {'name': 'VIP', 'price': price * 3.5, 'availableQty': 30},
+      ];
 
-      await OrganizerRepository().createEvent(
-        title: _titleController.text.trim(),
-        description: _descriptionController.text.trim(),
-        categoryId: _categoryId!,
-        venueId: _venueId!,
-        organizerId: _organizerId!,
-        startTime: start,
-        endTime: start.add(const Duration(hours: 3)),
-        heroImageUrl: _imageUrlController.text.trim(),
-        isFeatured: false,
-        ticketTiers: [
-          {'name': 'General', 'price': price, 'availableQty': 500},
-          {'name': 'Premium', 'price': price * 2, 'availableQty': 100},
-          {'name': 'VIP', 'price': price * 3.5, 'availableQty': 30},
-        ],
-      );
+      if (widget.event != null) {
+        await OrganizerRepository().updateEvent(
+          id: widget.event!.id,
+          title: _titleController.text.trim(),
+          description: _descriptionController.text.trim(),
+          categoryId: _categoryId!,
+          venueId: _venueId!,
+          startTime: start,
+          endTime: start.add(const Duration(hours: 3)),
+          heroImageUrl: _imageUrlController.text.trim(),
+          ticketTiers: ticketTiers,
+        );
+      } else {
+        await OrganizerRepository().createEvent(
+          title: _titleController.text.trim(),
+          description: _descriptionController.text.trim(),
+          categoryId: _categoryId!,
+          venueId: _venueId!,
+          organizerId: _organizerId!,
+          startTime: start,
+          endTime: start.add(const Duration(hours: 3)),
+          heroImageUrl: _imageUrlController.text.trim(),
+          isFeatured: false,
+          ticketTiers: ticketTiers,
+        );
+      }
 
-      ref.invalidate(eventsProvider(null));
+      ref.invalidate(eventsProvider);
       ref.invalidate(featuredEventsProvider);
       ref.invalidate(organizerEventsProvider);
       ref.invalidate(organizerStatsProvider);
@@ -144,8 +182,10 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Event published successfully!'),
+          SnackBar(
+            content: Text(widget.event != null
+                ? 'Event updated successfully!'
+                : 'Event published successfully!'),
             backgroundColor: AppColors.mahogany,
           ),
         );
@@ -154,7 +194,11 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
       if (mounted) {
         final errorMessage = ErrorHandler.getErrorMessage(e);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to publish event: $errorMessage')),
+          SnackBar(
+            content: Text(widget.event != null
+                ? 'Failed to update event: $errorMessage'
+                : 'Failed to publish event: $errorMessage'),
+          ),
         );
       }
     } finally {
@@ -169,7 +213,7 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('Create New Event'),
+        title: Text(widget.event != null ? 'Edit Event' : 'Create New Event'),
         centerTitle: true,
       ),
       body: LuxuryBackground(
@@ -215,11 +259,29 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                       _buildDropdown(
                         'Venue',
                         _venueId,
-                        _venues.map((v) => DropdownMenuItem(
-                          value: v['id'] as String,
-                          child: Text('${v['name']} — ${v['city']}'),
-                        )).toList(),
-                        (v) => setState(() => _venueId = v),
+                        [
+                          ..._venues.map((v) => DropdownMenuItem(
+                            value: v['id'] as String,
+                            child: Text('${v['name']} — ${v['city']}'),
+                          )),
+                          const DropdownMenuItem(
+                            value: 'ADD_CUSTOM',
+                            child: Row(
+                              children: [
+                                Icon(Icons.add, color: AppColors.gold, size: 18),
+                                SizedBox(width: 8),
+                                Text('Add Custom Venue...', style: TextStyle(color: AppColors.gold, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                        ],
+                        (v) {
+                          if (v == 'ADD_CUSTOM') {
+                            _showAddVenueDialog(context);
+                          } else {
+                            setState(() => _venueId = v);
+                          }
+                        },
                       ),
                       const SizedBox(height: 16),
                       _buildGlassTextField('Ticket Price (₹)', '999', Icons.confirmation_number,
@@ -236,7 +298,7 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
                         height: 56,
                         child: _isPublishing
                             ? const Center(child: CircularProgressIndicator())
-                            : PrimaryButton(text: 'Publish Event', onPressed: _publish),
+                            : PrimaryButton(text: widget.event != null ? 'Update Event' : 'Publish Event', onPressed: _publish),
                       ),
                       const SizedBox(height: 24),
                     ],
@@ -346,6 +408,143 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Future<void> _showAddVenueDialog(BuildContext context) async {
+    final nameCtrl = TextEditingController();
+    final addressCtrl = TextEditingController();
+    final cityCtrl = TextEditingController();
+    final stateCtrl = TextEditingController();
+    final zipCtrl = TextEditingController();
+    bool isSavingVenue = false;
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) {
+            return AlertDialog(
+              backgroundColor: AppColors.vanilla,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              title: Text('Add Custom Venue', style: AppTextStyles.sectionHeader.copyWith(color: AppColors.mahogany)),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: nameCtrl,
+                      style: const TextStyle(color: AppColors.mahogany),
+                      decoration: const InputDecoration(
+                        labelText: 'Venue Name',
+                        labelStyle: TextStyle(color: AppColors.mountain),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: addressCtrl,
+                      style: const TextStyle(color: AppColors.mahogany),
+                      decoration: const InputDecoration(
+                        labelText: 'Address',
+                        labelStyle: TextStyle(color: AppColors.mountain),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: cityCtrl,
+                      style: const TextStyle(color: AppColors.mahogany),
+                      decoration: const InputDecoration(
+                        labelText: 'City',
+                        labelStyle: TextStyle(color: AppColors.mountain),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: stateCtrl,
+                      style: const TextStyle(color: AppColors.mahogany),
+                      decoration: const InputDecoration(
+                        labelText: 'State',
+                        labelStyle: TextStyle(color: AppColors.mountain),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: zipCtrl,
+                      style: const TextStyle(color: AppColors.mahogany),
+                      decoration: const InputDecoration(
+                        labelText: 'Zip Code',
+                        labelStyle: TextStyle(color: AppColors.mountain),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isSavingVenue ? null : () => Navigator.pop(ctx),
+                  child: const Text('Cancel', style: TextStyle(color: AppColors.mountain)),
+                ),
+                isSavingVenue
+                    ? const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0),
+                        child: SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.gold),
+                        ),
+                      )
+                    : TextButton(
+                        onPressed: () async {
+                          if (nameCtrl.text.trim().isEmpty ||
+                              addressCtrl.text.trim().isEmpty ||
+                              cityCtrl.text.trim().isEmpty ||
+                              stateCtrl.text.trim().isEmpty ||
+                              zipCtrl.text.trim().isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Please fill all fields')),
+                            );
+                            return;
+                          }
+                          setDialogState(() => isSavingVenue = true);
+                          try {
+                            final newVenue = await OrganizerRepository().createVenue(
+                              name: nameCtrl.text.trim(),
+                              address: addressCtrl.text.trim(),
+                              city: cityCtrl.text.trim(),
+                              state: stateCtrl.text.trim(),
+                              zipCode: zipCtrl.text.trim(),
+                            );
+                            if (mounted) {
+                              setState(() {
+                                _venues.add(newVenue);
+                                _venueId = newVenue['id'] as String?;
+                              });
+                            }
+                            if (ctx.mounted) {
+                              Navigator.pop(ctx);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Venue added successfully!')),
+                              );
+                            }
+                          } catch (e) {
+                            if (ctx.mounted) {
+                              setDialogState(() => isSavingVenue = false);
+                              final errMsg = ErrorHandler.getErrorMessage(e);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Failed to add venue: $errMsg')),
+                              );
+                            }
+                          }
+                        },
+                        child: const Text('Add Venue', style: TextStyle(color: AppColors.gold, fontWeight: FontWeight.bold)),
+                      ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

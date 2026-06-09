@@ -236,10 +236,41 @@ export class EventsService {
 
   async update(id: string, updateEventDto: UpdateEventDto) {
     await this.findOne(id);
-    return this.prisma.event.update({
+    const { ticketTiers, ...eventData } = updateEventDto;
+
+    const updatedEvent = await this.prisma.event.update({
       where: { id },
-      data: updateEventDto,
+      data: eventData,
     });
+
+    if (ticketTiers && ticketTiers.length > 0) {
+      for (const tier of ticketTiers) {
+        const existingTier = await this.prisma.ticketTier.findFirst({
+          where: { eventId: id, name: tier.name },
+        });
+
+        if (existingTier) {
+          await this.prisma.ticketTier.update({
+            where: { id: existingTier.id },
+            data: {
+              price: tier.price,
+              availableQty: tier.availableQty,
+            },
+          });
+        } else {
+          await this.prisma.ticketTier.create({
+            data: {
+              eventId: id,
+              name: tier.name,
+              price: tier.price,
+              availableQty: tier.availableQty,
+            },
+          });
+        }
+      }
+    }
+
+    return this.findOne(id);
   }
 
   async remove(id: string) {

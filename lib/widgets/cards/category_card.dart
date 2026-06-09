@@ -52,9 +52,7 @@ class CategoryCard extends StatelessWidget {
             children: [
               CachedHeroImage(
                 imageUrl: imageUrl,
-                width: 48,
-                height: 48,
-                color: Colors.white,
+                fit: BoxFit.cover,
                 fallbackAsset: 'assets/images/placeholder_${category['name'].toString().toLowerCase().replaceAll(' ', '_')}.jpg',
               ),
               // Dynamic Overlay

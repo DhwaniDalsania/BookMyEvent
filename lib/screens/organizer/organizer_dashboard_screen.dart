@@ -84,7 +84,18 @@ class OrganizerDashboardScreen extends ConsumerWidget {
                     ...events.take(5).map((event) {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 16),
-                        child: _buildRecentEventCard(context, event),
+                        child: GestureDetector(
+                          onTap: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => CreateEventScreen(event: event),
+                              ),
+                            );
+                            ref.invalidate(organizerStatsProvider);
+                          },
+                          child: _buildRecentEventCard(context, event),
+                        ),
                       );
                     }),
                   const SizedBox(height: 100),

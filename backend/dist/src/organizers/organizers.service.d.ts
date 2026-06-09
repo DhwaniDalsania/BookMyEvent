@@ -238,6 +238,35 @@ export declare class OrganizersService {
                 revenueGenerated: import("@prisma/client/runtime/library").Decimal;
                 eventId: string;
             } | null;
+            category: {
+                id: string;
+                createdAt: Date;
+                updatedAt: Date;
+                name: string;
+                slug: string;
+                iconUrl: string | null;
+            };
+            venue: {
+                id: string;
+                createdAt: Date;
+                name: string;
+                address: string;
+                city: string;
+                state: string;
+                zipCode: string;
+                latitude: import("@prisma/client/runtime/library").Decimal | null;
+                longitude: import("@prisma/client/runtime/library").Decimal | null;
+                googleMapsUrl: string | null;
+                placeId: string | null;
+            };
+            ticketTiers: {
+                id: string;
+                name: string;
+                sectionId: string | null;
+                price: import("@prisma/client/runtime/library").Decimal;
+                availableQty: number;
+                eventId: string;
+            }[];
         } & {
             id: string;
             createdAt: Date;

@@ -11,6 +11,7 @@ import 'organizer/organizer_dashboard_screen.dart';
 import '../widgets/images/cached_hero_image.dart';
 import '../providers/auth_provider.dart';
 import '../providers/booking_provider.dart';
+import '../widgets/buttons/primary_button.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -87,25 +88,48 @@ class ProfileScreen extends ConsumerWidget {
                         right: 24,
                         child: Column(
                           children: [
-                            Container(
-                              width: 120,
-                              height: 120,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: AppColors.gold, width: 3),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.gold.withValues(alpha: 0.3),
-                                    blurRadius: 30,
-                                    offset: const Offset(0, 10),
+                            GestureDetector(
+                              onTap: () => _showChangePhotoSheet(context, ref, avatarUrl),
+                              child: Container(
+                                width: 120,
+                                height: 120,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: AppColors.gold, width: 3),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.gold.withValues(alpha: 0.3),
+                                      blurRadius: 30,
+                                      offset: const Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                child: ClipOval(
+                                  child: Stack(
+                                    children: [
+                                      Positioned.fill(
+                                        child: CachedHeroImage(
+                                          imageUrl: avatarUrl,
+                                          fit: BoxFit.cover,
+                                          placeholderIcon: Icons.person,
+                                        ),
+                                      ),
+                                      Positioned(
+                                        bottom: 0,
+                                        left: 0,
+                                        right: 0,
+                                        child: Container(
+                                          color: Colors.black.withValues(alpha: 0.5),
+                                          padding: const EdgeInsets.symmetric(vertical: 4),
+                                          child: const Icon(
+                                            Icons.camera_alt,
+                                            color: Colors.white,
+                                            size: 14,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                              child: ClipOval(
-                                child: CachedHeroImage(
-                                  imageUrl: avatarUrl,
-                                  fit: BoxFit.cover,
-                                  placeholderIcon: Icons.person,
                                 ),
                               ),
                             ).animate().scale(delay: 100.ms, duration: 400.ms, curve: Curves.easeOutBack),
@@ -270,6 +294,146 @@ class ProfileScreen extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showChangePhotoSheet(BuildContext context, WidgetRef ref, String currentUrl) {
+    final controller = TextEditingController(text: currentUrl);
+    String selectedUrl = currentUrl;
+
+    final avatarPresets = [
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
+      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200',
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200',
+      'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=200',
+      'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&q=80&w=200',
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.vanilla,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.fromLTRB(
+                24, 24, 24,
+                MediaQuery.of(context).viewInsets.bottom + 24,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Update Profile Picture',
+                    style: AppTextStyles.sectionHeader.copyWith(color: AppColors.mahogany),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Select a premium avatar or paste a custom URL below.',
+                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mountain),
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    height: 70,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: avatarPresets.length,
+                      itemBuilder: (context, index) {
+                        final url = avatarPresets[index];
+                        final isSelected = selectedUrl == url;
+                        return GestureDetector(
+                          onTap: () {
+                            setModalState(() {
+                              selectedUrl = url;
+                              controller.text = url;
+                            });
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 12),
+                            width: 60,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isSelected ? AppColors.gold : Colors.transparent,
+                                width: 3,
+                              ),
+                            ),
+                            child: ClipOval(
+                              child: Image.network(
+                                url,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => const Icon(Icons.person),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Profile Image URL',
+                    style: AppTextStyles.metadata.copyWith(color: AppColors.mountain),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: controller,
+                    onChanged: (val) {
+                      setModalState(() {
+                        selectedUrl = val.trim();
+                      });
+                    },
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      hintText: 'https://images.unsplash.com/...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: PrimaryButton(
+                      text: 'Save Picture',
+                      onPressed: () async {
+                        try {
+                          await ref.read(authProvider.notifier).updateProfile(
+                            profileImageUrl: selectedUrl.trim().isEmpty ? null : selectedUrl.trim(),
+                          );
+                          if (context.mounted) {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Profile picture updated successfully!')),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Failed to update picture: $e')),
+                            );
+                          }
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

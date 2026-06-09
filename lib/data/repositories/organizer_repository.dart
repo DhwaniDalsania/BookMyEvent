@@ -82,10 +82,51 @@ class OrganizerRepository {
     return EventModel.fromJson(response.data as Map<String, dynamic>);
   }
 
+  Future<EventModel> updateEvent({
+    required String id,
+    required String title,
+    required String description,
+    required String categoryId,
+    required String venueId,
+    required DateTime startTime,
+    required DateTime endTime,
+    required String heroImageUrl,
+    List<Map<String, dynamic>>? ticketTiers,
+  }) async {
+    final response = await _dio.patch('/events/$id', data: {
+      'title': title,
+      'description': description,
+      'categoryId': categoryId,
+      'venueId': venueId,
+      'startTime': startTime.toUtc().toIso8601String(),
+      'endTime': endTime.toUtc().toIso8601String(),
+      'heroImageUrl': heroImageUrl,
+      if (ticketTiers != null) 'ticketTiers': ticketTiers,
+    });
+    return EventModel.fromJson(response.data as Map<String, dynamic>);
+  }
+
   Future<List<Map<String, dynamic>>> getVenues() async {
     final response = await _dio.get('/venues');
     final data = response.data;
     if (data is List) return data.cast<Map<String, dynamic>>();
     return [];
+  }
+
+  Future<Map<String, dynamic>> createVenue({
+    required String name,
+    required String address,
+    required String city,
+    required String state,
+    required String zipCode,
+  }) async {
+    final response = await _dio.post('/venues', data: {
+      'name': name,
+      'address': address,
+      'city': city,
+      'state': state,
+      'zipCode': zipCode,
+    });
+    return response.data as Map<String, dynamic>;
   }
 }

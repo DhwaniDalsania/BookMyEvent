@@ -38,6 +38,7 @@ class EventRepository {
         heroImageUrl: m['image'] as String?,
         status: 'published',
         categoryId: m['id'] as String,
+        venueId: '',
         categoryName: m['category'] as String,
         locationName: m['location'] as String? ?? 'TBD',
         startingPrice: (m['price'] as num?)?.toDouble() ?? 0,

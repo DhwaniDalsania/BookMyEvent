@@ -32,6 +32,7 @@ export declare class UpdateEventDto {
     heroImageUrl?: string;
     status?: EventStatus;
     isFeatured?: boolean;
+    ticketTiers?: CreateTicketTierDto[];
 }
 export declare class QueryEventDto {
     q?: string;

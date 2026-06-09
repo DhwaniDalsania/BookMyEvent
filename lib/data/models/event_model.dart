@@ -7,6 +7,7 @@ class EventModel {
   final String? heroImageUrl;
   final String? status;
   final String categoryId;
+  final String venueId;
   final String categoryName;
   final String locationName;
   final double startingPrice;
@@ -21,6 +22,7 @@ class EventModel {
     this.heroImageUrl,
     this.status,
     required this.categoryId,
+    required this.venueId,
     this.categoryName = 'Category',
     this.locationName = 'TBD',
     this.startingPrice = 0.0,
@@ -52,6 +54,7 @@ class EventModel {
       heroImageUrl: json['heroImageUrl'],
       status: json['status'],
       categoryId: json['categoryId'] ?? '',
+      venueId: json['venueId'] ?? '',
       categoryName: json['category'] != null ? (json['category']['name'] ?? 'Category') : 'Category',
       locationName: loc,
       startingPrice: price,

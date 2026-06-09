@@ -73,6 +73,77 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
     }
   }
 
+  void _showEditImageSheet(BuildContext context) {
+    final avatarPresets = [
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
+      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200',
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200',
+      'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=200',
+      'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&q=80&w=200',
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.vanilla,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Choose Profile Picture',
+                style: AppTextStyles.sectionHeader.copyWith(color: AppColors.mahogany),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                height: 70,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: avatarPresets.length,
+                  itemBuilder: (context, index) {
+                    final url = avatarPresets[index];
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _imageUrlController.text = url;
+                        });
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 12),
+                        width: 60,
+                        height: 60,
+                        decoration: const BoxDecoration(shape: BoxShape.circle),
+                        child: ClipOval(
+                          child: Image.network(
+                            url,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => const Icon(Icons.person),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 24),
+              PrimaryButton(
+                text: 'Cancel',
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(authProvider).value;
@@ -91,14 +162,32 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(60),
-              child: CachedHeroImage(
-                imageUrl: imageUrl,
-                width: 120,
-                height: 120,
-                fit: BoxFit.cover,
-                placeholderIcon: Icons.person,
+            GestureDetector(
+              onTap: () => _showEditImageSheet(context),
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(60),
+                    child: CachedHeroImage(
+                      imageUrl: imageUrl,
+                      width: 120,
+                      height: 120,
+                      fit: BoxFit.cover,
+                      placeholderIcon: Icons.person,
+                    ),
+                  ),
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Center(
+                        child: Icon(Icons.camera_alt, color: Colors.white, size: 24),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 32),
