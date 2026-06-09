@@ -1,0 +1,98 @@
+import { OrganizersService } from './organizers.service';
+import { CreateOrganizerDto, UpdateOrganizerDto } from './dto/organizer.dto';
+import type { AuthenticatedRequest } from '../auth/authenticated-request.interface';
+export declare class OrganizersController {
+    private readonly organizersService;
+    constructor(organizersService: OrganizersService);
+    create(createOrganizerDto: CreateOrganizerDto, req: AuthenticatedRequest): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        name: string;
+        userId: string;
+        description: string | null;
+        logoUrl: string | null;
+        contactEmail: string;
+        contactPhone: string | null;
+        isVerified: boolean;
+        verificationStatus: import("@prisma/client").$Enums.VerificationStatus;
+        verificationDate: Date | null;
+    }>;
+    findAll(): import("@prisma/client").Prisma.PrismaPromise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        name: string;
+        userId: string;
+        description: string | null;
+        logoUrl: string | null;
+        contactEmail: string;
+        contactPhone: string | null;
+        isVerified: boolean;
+        verificationStatus: import("@prisma/client").$Enums.VerificationStatus;
+        verificationDate: Date | null;
+    }[]>;
+    findOne(id: string): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        name: string;
+        userId: string;
+        description: string | null;
+        logoUrl: string | null;
+        contactEmail: string;
+        contactPhone: string | null;
+        isVerified: boolean;
+        verificationStatus: import("@prisma/client").$Enums.VerificationStatus;
+        verificationDate: Date | null;
+    }>;
+    getEvents(id: string): Promise<{
+        id: string;
+        createdAt: Date;
+        deletedAt: Date | null;
+        slug: string;
+        description: string;
+        title: string;
+        categoryId: string;
+        venueId: string;
+        organizerId: string;
+        startTime: Date;
+        endTime: Date;
+        status: import("@prisma/client").$Enums.EventStatus;
+        heroImageUrl: string;
+        isFeatured: boolean;
+    }[]>;
+    update(id: string, updateOrganizerDto: UpdateOrganizerDto): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        name: string;
+        userId: string;
+        description: string | null;
+        logoUrl: string | null;
+        contactEmail: string;
+        contactPhone: string | null;
+        isVerified: boolean;
+        verificationStatus: import("@prisma/client").$Enums.VerificationStatus;
+        verificationDate: Date | null;
+    }>;
+    remove(id: string): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        name: string;
+        userId: string;
+        description: string | null;
+        logoUrl: string | null;
+        contactEmail: string;
+        contactPhone: string | null;
+        isVerified: boolean;
+        verificationStatus: import("@prisma/client").$Enums.VerificationStatus;
+        verificationDate: Date | null;
+    }>;
+}
