@@ -28,7 +28,8 @@ class BookingModel {
       eventId: json['eventId'] ?? '',
       status: json['status'] ?? 'PENDING',
       finalAmount: double.tryParse(json['finalAmount'].toString()) ?? 0.0,
-      ticketCount: json['ticketCount'] ?? 0,
+      ticketCount: json['ticketCount'] ??
+          (json['tickets'] is List ? (json['tickets'] as List).length : 0),
       razorpayOrderId: json['payment']?['razorpayOrderId'],
       event: json['event'] != null ? EventModel.fromJson(json['event']) : null,
     );

@@ -7,8 +7,8 @@ import 'dart:ui';
 import 'dart:async';
 import 'package:intl/intl.dart';
 
-import '../constants/mock_data.dart';
 import '../theme/app_colors.dart';
+import '../providers/navigation_provider.dart';
 import '../theme/app_text_styles.dart';
 import '../widgets/cards/event_card.dart';
 import '../widgets/cards/category_card.dart';
@@ -28,6 +28,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
   int _currentHeroPage = 0;
   int _activeCategoryIndex = 0;
+  String? _selectedCategorySlug;
   Timer? _heroTimer;
 
   @override
@@ -41,7 +42,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (!mounted) return;
     if (_heroController.hasClients) {
       int nextPage = _currentHeroPage + 1;
-      if (nextPage >= 3) {
+      final heroCount = ref.read(featuredEventsProvider).value?.length ?? 0;
+      if (heroCount == 0) return;
+      if (nextPage >= heroCount) {
         nextPage = 0;
       }
       _heroController.animateToPage(
@@ -63,7 +66,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final featuredAsync = ref.watch(featuredEventsProvider);
-    final eventsAsync = ref.watch(eventsProvider(null));
+    final categoriesAsync = ref.watch(categoriesProvider);
+    final eventsAsync = ref.watch(eventsProvider(_selectedCategorySlug));
 
     // Fallbacks while loading
     final List<EventModel> heroEvents = featuredAsync.value?.take(3).toList() ?? [];
@@ -197,7 +201,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           color: Colors.white,
                           loadingBuilder: (context, child, loadingProgress) { if (loadingProgress == null) return child; return Container(color: Colors.grey[900], child: const Center(child: CircularProgressIndicator(color: Colors.white24, strokeWidth: 2))); }, errorBuilder: (context, error, stackTrace) => const Text('BOOKMYEVENT', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 3)),
                         ),
-                        GlassButton(icon: Icons.person, onTap: () {}, size: 48),
+                        GlassButton(
+                          icon: Icons.person,
+                          onTap: () => ref.read(navigationIndexProvider.notifier).state = 3,
+                          size: 48,
+                        ),
                       ],
                     ),
                   ),
@@ -316,25 +324,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           SliverToBoxAdapter(
             child: SizedBox(
               height: 200,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 32),
-                itemCount: MockData.categories.length,
-                itemBuilder: (context, index) {
-                  final cat = MockData.categories[index];
-                  final images = [
-                    'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600&auto=format&fit=crop', // Music
-                    'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=600&auto=format&fit=crop', // Sports
-                    'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?q=80&w=600&auto=format&fit=crop', // Comedy
-                    'https://images.unsplash.com/photo-1507676184212-d0330a15233c?q=80&w=600&auto=format&fit=crop', // Theater
-                  ];
-                  return CategoryCard(
-                    category: cat,
-                    isActive: _activeCategoryIndex == index,
-                    onTap: () => setState(() => _activeCategoryIndex = index),
-                    imageUrl: images[index % images.length],
-                  ).animate().fadeIn(delay: (50 * index).ms).slideX(begin: 0.1);
-                },
+              child: categoriesAsync.when(
+                data: (categories) => ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+                    final cat = categories[index];
+                    return CategoryCard(
+                      category: {'id': cat.id, 'name': cat.name},
+                      isActive: _activeCategoryIndex == index,
+                      onTap: () => setState(() {
+                        _activeCategoryIndex = index;
+                        _selectedCategorySlug = _selectedCategorySlug == cat.slug ? null : cat.slug;
+                      }),
+                      imageUrl: cat.iconUrl ?? 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600&auto=format&fit=crop',
+                    ).animate().fadeIn(delay: (50 * index).ms).slideX(begin: 0.1);
+                  },
+                ),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (_, __) => const SizedBox.shrink(),
               ),
             ),
           ),

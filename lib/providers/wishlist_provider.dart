@@ -8,3 +8,8 @@ final wishlistProvider = FutureProvider<List<EventModel>>((ref) async {
   final repo = ref.watch(wishlistRepositoryProvider);
   return repo.getWishlist();
 });
+
+final wishlistIdsProvider = FutureProvider<Set<String>>((ref) async {
+  final events = await ref.watch(wishlistProvider.future);
+  return events.map((e) => e.id).toSet();
+});

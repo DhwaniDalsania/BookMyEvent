@@ -38,7 +38,9 @@ class EventModel {
     double price = 0.0;
     if (json['ticketTiers'] != null && (json['ticketTiers'] as List).isNotEmpty) {
       final tiers = json['ticketTiers'] as List;
-      price = double.tryParse(tiers[0]['price'].toString()) ?? 0.0;
+      price = tiers
+          .map((t) => double.tryParse(t['price'].toString()) ?? 0.0)
+          .reduce((a, b) => a < b ? a : b);
     }
 
     return EventModel(

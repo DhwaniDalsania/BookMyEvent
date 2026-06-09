@@ -16,3 +16,13 @@ final eventsProvider = FutureProvider.family<List<EventModel>, String?>((ref, ca
 final featuredEventsProvider = FutureProvider<List<EventModel>>((ref) async {
   return ref.read(eventRepositoryProvider).getFeaturedEvents();
 });
+
+final searchResultsProvider = FutureProvider.family<List<EventModel>, String>((ref, query) async {
+  if (query.trim().isEmpty) return [];
+  return ref.read(eventRepositoryProvider).searchEvents(query.trim());
+});
+
+final searchEventsProvider = FutureProvider.family<List<EventModel>, String>((ref, query) async {
+  if (query.trim().isEmpty) return [];
+  return ref.read(eventRepositoryProvider).searchEvents(query.trim());
+});

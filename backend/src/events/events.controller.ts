@@ -46,6 +46,11 @@ export class EventsController {
     return this.eventsService.findOneBySlug(slug);
   }
 
+  @Get(':id/seat-map')
+  getSeatMap(@Param('id') id: string) {
+    return this.eventsService.getSeatMap(id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.eventsService.findOne(id);

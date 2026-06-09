@@ -21,13 +21,18 @@ class ExploreScreen extends ConsumerStatefulWidget {
 class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   final List<String> _trendingSearches = ['Coldplay', 'Stand-up Comedy', 'Music Festivals', 'Arijit Singh'];
   final List<String> _recentSearches = ['Mumbai City FC', 'Lollapalooza', 'Pottery Workshop'];
+  String _searchQuery = '';
 
   @override
   Widget build(BuildContext context) {
+    final searchAsync = _searchQuery.trim().isNotEmpty
+        ? ref.watch(searchResultsProvider(_searchQuery))
+        : null;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () => _showFilterSheet(context),
         backgroundColor: AppColors.mahogany,
         icon: const Icon(Icons.tune, color: AppColors.gold, size: 20),
         label: Text('Filters', style: AppTextStyles.button.copyWith(color: AppColors.gold, fontSize: 14)),
@@ -69,7 +74,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                         Text('Find your next', style: AppTextStyles.heroTitle.copyWith(fontSize: 32, color: Colors.white, height: 1.1)),
                         Text('Experience', style: AppTextStyles.heroTitle.copyWith(fontSize: 32, color: AppColors.gold, height: 1.1)),
                         const SizedBox(height: 24),
-                        const CustomSearchBar(hintText: 'Search artists, venues, events...'),
+                        CustomSearchBar(
+                          hintText: 'Search artists, venues, events...',
+                          onChanged: (value) => setState(() => _searchQuery = value),
+                        ),
                       ],
                     ),
                   ),
@@ -84,11 +92,45 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (_searchQuery.isNotEmpty) _buildSearchResults(),
+
                   // Search Suggestions
-                  _buildSearchTags('Trending Searches', _trendingSearches, AppColors.gold),
-                  _buildSearchTags('Recent Searches', _recentSearches, AppColors.mountain),
+                  if (_searchQuery.isEmpty) _buildSearchTags('Trending Searches', _trendingSearches, AppColors.gold),
+                  if (_searchQuery.isEmpty) _buildSearchTags('Recent Searches', _recentSearches, AppColors.mountain),
                   
                   const SizedBox(height: 40),
+
+                  if (searchAsync != null)
+                    searchAsync.when(
+                      data: (results) => Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSectionHeader('Search Results', '${results.length} events found'),
+                          if (results.isEmpty)
+                            const Padding(
+                              padding: EdgeInsets.all(24),
+                              child: Text('No events match your search.', style: TextStyle(color: AppColors.mountain)),
+                            )
+                          else
+                            ...results.map((e) => Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                                  child: CompactEventCard(
+                                    event: e,
+                                    onTap: () => _navigateToDetails(context, e),
+                                  ),
+                                )),
+                          const SizedBox(height: 48),
+                        ],
+                      ),
+                      loading: () => const Padding(
+                        padding: EdgeInsets.all(48),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                      error: (e, _) => Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Text('Search failed: $e'),
+                      ),
+                    ),
 
                   // Trending Events Carousel
                   _buildSectionHeader('Trending Events', 'Most popular right now'),
@@ -116,6 +158,40 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSearchResults() {
+    final resultsAsync = ref.watch(searchEventsProvider(_searchQuery));
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+      child: resultsAsync.when(
+        data: (events) {
+          if (events.isEmpty) {
+            return Text('No events found for "$_searchQuery"',
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mountain));
+          }
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Search Results', style: AppTextStyles.sectionHeader.copyWith(color: AppColors.mahogany, fontSize: 20)),
+              const SizedBox(height: 16),
+              ...events.take(10).map((event) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: CompactEventCard(
+                      event: event,
+                      onTap: () => _navigateToDetails(context, event),
+                    ),
+                  )),
+            ],
+          );
+        },
+        loading: () => const Padding(
+          padding: EdgeInsets.all(24),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+        error: (e, _) => Text('Search failed: $e', style: const TextStyle(color: Colors.red)),
       ),
     );
   }
@@ -290,7 +366,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 child: CategoryCard(
                   category: { 'name': categories[index].name, 'icon': categories[index].iconUrl ?? '🎤' }, // mapping to existing ui struct
                   isActive: false,
-                  onTap: () {},
+                  onTap: () {
+                    ref.invalidate(eventsProvider(categories[index].slug));
+                  },
                   imageUrl: categories[index].iconUrl ?? 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=400&auto=format&fit=crop',
                 ),
               ).animate().fadeIn(delay: (index * 50).ms).slideY(begin: 0.1);
@@ -300,6 +378,39 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       },
       loading: () => const SizedBox(height: 120, child: Center(child: CircularProgressIndicator())),
       error: (e, s) => const SizedBox.shrink(),
+    );
+  }
+
+  void _showFilterSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.vanilla,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Quick Filters', style: AppTextStyles.sectionHeader.copyWith(color: AppColors.mahogany)),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 8,
+              children: ['Concerts', 'Comedy', 'Sports', 'Festivals', 'Theatre'].map((tag) {
+                return ActionChip(
+                  label: Text(tag),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    setState(() => _searchQuery = tag);
+                  },
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

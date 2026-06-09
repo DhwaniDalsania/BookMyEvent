@@ -1,37 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_colors.dart';
 import 'home_screen.dart';
 import 'explore_screen.dart';
 import 'bookings_screen.dart';
 import 'profile_screen.dart';
 import '../widgets/navigation/floating_nav_bar.dart';
+import '../providers/navigation_provider.dart';
 
-class MainLayout extends StatefulWidget {
+class MainLayout extends ConsumerWidget {
   const MainLayout({super.key});
 
   @override
-  State<MainLayout> createState() => _MainLayoutState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentIndex = ref.watch(navigationIndexProvider);
 
-class _MainLayoutState extends State<MainLayout> {
-  int _currentIndex = 0;
+    final screens = [
+      const HomeScreen(),
+      const ExploreScreen(),
+      const BookingsScreen(),
+      const ProfileScreen(),
+    ];
 
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    const ExploreScreen(),
-    const BookingsScreen(), // Bookings/Tickets
-    const ProfileScreen(),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.vanilla,
       body: Stack(
         children: [
           IndexedStack(
-            index: _currentIndex,
-            children: _screens,
+            index: currentIndex,
+            children: screens,
           ),
           Positioned(
             bottom: 32,
@@ -41,11 +38,9 @@ class _MainLayoutState extends State<MainLayout> {
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: FloatingNavBar(
-                  currentIndex: _currentIndex,
+                  currentIndex: currentIndex,
                   onTap: (index) {
-                    setState(() {
-                      _currentIndex = index;
-                    });
+                    ref.read(navigationIndexProvider.notifier).state = index;
                   },
                 ),
               ),

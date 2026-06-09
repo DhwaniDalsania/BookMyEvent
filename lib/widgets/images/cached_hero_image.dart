@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../theme/app_colors.dart';
 
 class CachedHeroImage extends StatelessWidget {
   final String imageUrl;
@@ -8,6 +9,7 @@ class CachedHeroImage extends StatelessWidget {
   final BoxFit fit;
   final String? fallbackAsset;
   final Color? color;
+  final IconData placeholderIcon;
 
   const CachedHeroImage({
     super.key,
@@ -17,10 +19,35 @@ class CachedHeroImage extends StatelessWidget {
     this.fit = BoxFit.cover,
     this.fallbackAsset,
     this.color,
+    this.placeholderIcon = Icons.image_outlined,
   });
+
+  Widget _buildPlaceholder() {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.mahogany.withValues(alpha: 0.8),
+            AppColors.mountain.withValues(alpha: 0.6),
+          ],
+        ),
+      ),
+      child: Center(
+        child: Icon(placeholderIcon, color: Colors.white24, size: 32),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (imageUrl.isEmpty) {
+      return _buildPlaceholder();
+    }
+
     return CachedNetworkImage(
       imageUrl: imageUrl,
       width: width,
@@ -28,9 +55,9 @@ class CachedHeroImage extends StatelessWidget {
       fit: fit,
       color: color,
       placeholder: (context, url) => Container(
-        color: Colors.grey[900],
         width: width,
         height: height,
+        color: Colors.grey[900],
         child: const Center(
           child: CircularProgressIndicator(color: Colors.white24, strokeWidth: 2),
         ),
@@ -43,16 +70,10 @@ class CachedHeroImage extends StatelessWidget {
             height: height,
             fit: fit,
             color: color,
+            errorBuilder: (_, __, ___) => _buildPlaceholder(),
           );
         }
-        return Container(
-          color: Colors.grey[900],
-          width: width,
-          height: height,
-          child: const Center(
-            child: Icon(Icons.broken_image, color: Colors.white24),
-          ),
-        );
+        return _buildPlaceholder();
       },
     );
   }

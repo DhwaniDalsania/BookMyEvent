@@ -4,6 +4,7 @@ import '../../core/network/api_client.dart';
 import '../../constants/mock_data.dart';
 import '../models/event_model.dart';
 import '../models/category_model.dart';
+import '../models/seat_model.dart';
 
 class EventRepository {
   final Dio _dio = apiClient;
@@ -113,7 +114,10 @@ class EventRepository {
 
   Future<List<EventModel>> getFeaturedEvents() async {
     try {
-      final response = await _dio.get('/events', queryParameters: {'limit': 5});
+      final response = await _dio.get('/events', queryParameters: {
+        'featured': 'true',
+        'take': '5',
+      });
       final events = _parseEvents(response.data);
 
       if (events.isNotEmpty) return events.take(5).toList();
@@ -122,5 +126,38 @@ class EventRepository {
       debugPrint('⚠️ getFeaturedEvents API error, using mock data: $e');
     }
     return _mockEvents(limit: 5);
+  }
+
+  Future<List<EventModel>> searchEvents(String query) async {
+    try {
+      final response = await _dio.get('/events/search', queryParameters: {'q': query});
+      final events = _parseEvents(response.data);
+      if (events.isNotEmpty) return events;
+    } catch (e) {
+      debugPrint('⚠️ searchEvents API error: $e');
+    }
+    return _mockEvents().where((e) =>
+        e.title.toLowerCase().contains(query.toLowerCase()) ||
+        e.categoryName.toLowerCase().contains(query.toLowerCase())).toList();
+  }
+
+  Future<SeatMapModel> getSeatMap(String eventId, {double fallbackPrice = 999}) async {
+    try {
+      final response = await _dio.get('/events/$eventId/seat-map');
+      return SeatMapModel.fromJson(response.data as Map<String, dynamic>);
+    } catch (e) {
+      debugPrint('⚠️ getSeatMap error, using mock: $e');
+      return SeatMapModel.mock(eventId, fallbackPrice);
+    }
+  }
+
+  Future<EventModel?> getEventById(String id) async {
+    try {
+      final response = await _dio.get('/events/$id');
+      return EventModel.fromJson(response.data as Map<String, dynamic>);
+    } catch (e) {
+      debugPrint('⚠️ getEventById error: $e');
+      return null;
+    }
   }
 }

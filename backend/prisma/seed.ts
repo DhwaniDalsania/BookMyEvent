@@ -103,12 +103,83 @@ async function main() {
   const venueIds: string[] = [];
   for (const v of venueData) {
     const venue = await prisma.venue.create({ data: v }).catch(async () => {
-      // May already exist if seeded before; just fetch by name+city
       return prisma.venue.findFirst({ where: { name: v.name, city: v.city } }) as any;
     });
     venueIds.push(venue!.id);
+
+    const existingSeats = await prisma.seat.count({ where: { venueId: venue!.id } });
+    if (existingSeats === 0) {
+      const section = await prisma.venueSection.create({
+        data: {
+          venueId: venue!.id,
+          name: 'Main Floor',
+          type: 'RESERVED',
+          capacity: 64,
+        },
+      });
+      const seats: {
+        venueId: string;
+        sectionId: string;
+        rowName: string;
+        seatNumber: string;
+        seatType: string;
+      }[] = [];
+      for (let r = 0; r < 8; r++) {
+        const rowName = String.fromCharCode(65 + r);
+        for (let c = 1; c <= 8; c++) {
+          seats.push({
+            venueId: venue!.id,
+            sectionId: section.id,
+            rowName,
+            seatNumber: String(c),
+            seatType: r < 2 ? 'VIP' : r < 5 ? 'Premium' : 'Standard',
+          });
+        }
+      }
+      await prisma.seat.createMany({ data: seats });
+    }
   }
   console.log('✅ Venues seeded:', venueIds.length);
+
+  // ─── 4b. Venue Sections & Seats (8×8 grid per venue) ─────────────────────
+  const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+  let seatCount = 0;
+  for (const venueId of venueIds) {
+    let section = await prisma.venueSection.findFirst({
+      where: { venueId, name: 'Main Floor' },
+    });
+    if (!section) {
+      section = await prisma.venueSection.create({
+        data: {
+          venueId,
+          name: 'Main Floor',
+          type: 'RESERVED',
+          capacity: 64,
+        },
+      });
+    }
+
+    const existingSeats = await prisma.seat.count({
+      where: { venueId, sectionId: section.id },
+    });
+    if (existingSeats === 0) {
+      for (const row of rows) {
+        for (let col = 1; col <= 8; col++) {
+          await prisma.seat.create({
+            data: {
+              venueId,
+              sectionId: section.id,
+              rowName: row,
+              seatNumber: String(col),
+              seatType: 'Standard',
+            },
+          });
+          seatCount++;
+        }
+      }
+    }
+  }
+  console.log('✅ Seats seeded:', seatCount > 0 ? seatCount : 'already exist');
 
   // Helper: get or create venue by index
   const getVenueId = (index: number) => venueIds[index % venueIds.length];

@@ -10,13 +10,15 @@ import '../widgets/layout/luxury_background.dart';
 import 'booking_success_screen.dart';
 import '../data/models/event_model.dart';
 import '../data/models/booking_model.dart';
+import '../data/models/seat_model.dart';
+import '../providers/auth_provider.dart';
 import '../providers/booking_provider.dart';
 import '../providers/payment_provider.dart';
 import '../widgets/images/cached_hero_image.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   final EventModel event;
-  final List<String> selectedSeats;
+  final List<SelectedSeat> selectedSeats;
 
   const CheckoutScreen({super.key, required this.event, required this.selectedSeats});
 
@@ -58,6 +60,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       );
 
       if (isSuccess && mounted) {
+        ref.invalidate(userBookingsProvider);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -118,8 +121,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         'description': 'Tickets for ${widget.event.title}',
         'order_id': orderId,
         'prefill': {
-          'contact': '9999999999',
-          'email': 'user@example.com'
+          'contact': ref.read(authProvider).value?.phoneNumber ?? '',
+          'email': ref.read(authProvider).value?.email ?? '',
         }
       };
       _razorpay.open(options);
@@ -131,7 +134,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ticketPrice = widget.event.startingPrice * widget.selectedSeats.length;
+    final ticketPrice = widget.selectedSeats.fold(0.0, (sum, s) => sum + s.price);
     final bookingFee = 99.0;
     final platformFee = 49.0;
     final totalAmount = ticketPrice + bookingFee + platformFee;
@@ -277,7 +280,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     padding: const EdgeInsets.all(24),
                     child: Column(
                       children: [
-                        _buildReceiptRow('Seats (${widget.selectedSeats.length})', widget.selectedSeats.join(', '), isBold: true),
+                        _buildReceiptRow('Seats (${widget.selectedSeats.length})', widget.selectedSeats.map((s) => s.label).join(', '), isBold: true),
                         const SizedBox(height: 16),
                         _buildReceiptRow('Ticket Price', '₹${ticketPrice.toInt()}'),
                         const SizedBox(height: 12),

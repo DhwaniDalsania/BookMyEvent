@@ -6,13 +6,28 @@ import {
   IsOptional,
   IsString,
   IsArray,
+  IsNumber,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export enum EventStatus {
   DRAFT = 'DRAFT',
   PUBLISHED = 'PUBLISHED',
   CANCELLED = 'CANCELLED',
   COMPLETED = 'COMPLETED',
+}
+
+export class CreateTicketTierDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsNumber()
+  price: number;
+
+  @IsNumber()
+  availableQty: number;
 }
 
 export class CreateEventDto {
@@ -55,6 +70,12 @@ export class CreateEventDto {
   @IsBoolean()
   @IsOptional()
   isFeatured?: boolean;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateTicketTierDto)
+  @IsOptional()
+  ticketTiers?: CreateTicketTierDto[];
 }
 
 export class UpdateEventDto {

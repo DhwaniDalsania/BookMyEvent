@@ -17,10 +17,11 @@ class AuthRepository {
 
       final token = response.data['accessToken'] ?? response.data['token'] ?? response.data['jwt'];
       await SecureStorage.saveToken(token);
+      final refresh = response.data['refreshToken'];
+      if (refresh != null) await SecureStorage.saveRefreshToken(refresh);
 
       return response.data;
     } catch (e) {
-      // Log error for debugging
       debugPrint('🚨 Login request failed: $e');
       rethrow;
     }
@@ -39,7 +40,9 @@ class AuthRepository {
       
       final token = response.data['accessToken'] ?? response.data['token'] ?? response.data['jwt'];
       await SecureStorage.saveToken(token);
-      
+      final refresh = response.data['refreshToken'];
+      if (refresh != null) await SecureStorage.saveRefreshToken(refresh);
+
       return response.data;
     } catch (e) {
       debugPrint('🚨 Register request failed: $e');
@@ -65,6 +68,24 @@ class AuthRepository {
   }
 
   Future<void> logout() async {
-    await SecureStorage.deleteToken();
+    try {
+      await _dio.post('/auth/logout');
+    } catch (_) {}
+    await SecureStorage.clearAll();
+  }
+
+  Future<UserModel> updateProfile({
+    String? firstName,
+    String? lastName,
+    String? phoneNumber,
+    String? profileImageUrl,
+  }) async {
+    final response = await _dio.patch('/auth/me', data: {
+      if (firstName != null) 'firstName': firstName,
+      if (lastName != null) 'lastName': lastName,
+      if (phoneNumber != null) 'phoneNumber': phoneNumber,
+      if (profileImageUrl != null) 'profileImageUrl': profileImageUrl,
+    });
+    return UserModel.fromJson(response.data as Map<String, dynamic>);
   }
 }

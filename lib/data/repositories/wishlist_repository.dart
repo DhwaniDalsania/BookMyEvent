@@ -18,8 +18,16 @@ class WishlistRepository {
     }
   }
 
-  Future<void> toggleWishlist(String eventId) async {
-    // Basic toggle mechanism
+  Future<void> addToWishlist(String eventId) async {
     await _dio.post('/wishlist/$eventId');
+  }
+
+  Future<void> removeFromWishlist(String eventId) async {
+    await _dio.delete('/wishlist/$eventId');
+  }
+
+  Future<bool> isInWishlist(String eventId) async {
+    final items = await getWishlist();
+    return items.any((e) => e.id == eventId);
   }
 }

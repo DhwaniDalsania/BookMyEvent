@@ -11,6 +11,10 @@ import '../data/models/event_model.dart';
 import 'package:intl/intl.dart';
 import '../widgets/images/cached_hero_image.dart';
 import '../providers/event_provider.dart';
+import '../providers/auth_provider.dart';
+import '../providers/wishlist_provider.dart';
+import '../data/repositories/wishlist_repository.dart';
+import 'login_screen.dart';
 
 class EventDetailsScreen extends ConsumerWidget {
   final EventModel event;
@@ -20,6 +24,8 @@ class EventDetailsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final allEventsAsync = ref.watch(eventsProvider(null));
+    final wishlistIds = ref.watch(wishlistIdsProvider);
+    final isSaved = wishlistIds.value?.contains(event.id) ?? false;
     final List<EventModel> similarEvents = allEventsAsync.value
         ?.where((e) => e.id != event.id && e.categoryId == event.categoryId)
         .take(5)
@@ -75,7 +81,34 @@ class EventDetailsScreen extends ConsumerWidget {
                 actions: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: GlassButton(icon: Icons.favorite_border, onTap: () {}),
+                    child: GlassButton(
+                      icon: isSaved ? Icons.favorite : Icons.favorite_border,
+                      onTap: () async {
+                        final user = ref.read(authProvider).value;
+                        if (user == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Please sign in to save events')),
+                          );
+                          return;
+                        }
+                        try {
+                          final repo = ref.read(wishlistRepositoryProvider);
+                          if (isSaved) {
+                            await repo.removeFromWishlist(event.id);
+                          } else {
+                            await repo.addToWishlist(event.id);
+                          }
+                          ref.invalidate(wishlistProvider);
+                          ref.invalidate(wishlistIdsProvider);
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Wishlist error: $e')),
+                            );
+                          }
+                        }
+                      },
+                    ),
                   ),
                   const SizedBox(width: 8),
                 ],
@@ -267,6 +300,27 @@ class EventDetailsScreen extends ConsumerWidget {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(40),
                       onTap: () {
+                        final user = ref.read(authProvider).value;
+                        if (user == null) {
+                          showDialog(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: const Text('Sign in required'),
+                              content: const Text('Please sign in to book tickets for this event.'),
+                              actions: [
+                                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(ctx);
+                                    Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+                                  },
+                                  child: const Text('Sign In'),
+                                ),
+                              ],
+                            ),
+                          );
+                          return;
+                        }
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => SeatSelectionScreen(event: event)),

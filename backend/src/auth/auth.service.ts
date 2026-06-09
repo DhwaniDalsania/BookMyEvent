@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -98,7 +99,11 @@ export class AuthService {
         email: true,
         phoneNumber: true,
         role: true,
+        profileImageUrl: true,
         createdAt: true,
+        organizer: {
+          select: { id: true, name: true },
+        },
       },
     });
 
@@ -107,6 +112,31 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  async updateMe(userId: string, dto: UpdateProfileDto) {
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: dto,
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        phoneNumber: true,
+        role: true,
+        profileImageUrl: true,
+        createdAt: true,
+        organizer: {
+          select: { id: true, name: true },
+        },
+      },
+    });
+    return user;
+  }
+
+  async updateProfile(userId: string, dto: UpdateProfileDto) {
+    return this.updateMe(userId, dto);
   }
 
   private async generateTokens(user: any) {

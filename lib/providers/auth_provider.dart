@@ -60,4 +60,19 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
     await _repository.logout();
     state = const AsyncData(null);
   }
+
+  Future<void> updateProfile({
+    String? firstName,
+    String? lastName,
+    String? phoneNumber,
+    String? profileImageUrl,
+  }) async {
+    final user = await _repository.updateProfile(
+      firstName: firstName,
+      lastName: lastName,
+      phoneNumber: phoneNumber,
+      profileImageUrl: profileImageUrl,
+    );
+    state = AsyncData(user);
+  }
 }

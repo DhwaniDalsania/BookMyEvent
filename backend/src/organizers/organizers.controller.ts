@@ -39,6 +39,27 @@ export class OrganizersController {
     return this.organizersService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'ORGANIZER')
+  @Get('me/profile')
+  getMyProfile(@Request() req: AuthenticatedRequest) {
+    return this.organizersService.findOneByUserId(req.user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'ORGANIZER')
+  @Get('me/events')
+  getMyEvents(@Request() req: AuthenticatedRequest) {
+    return this.organizersService.getEventsByUserId(req.user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'ORGANIZER')
+  @Get('me/stats')
+  getMyStats(@Request() req: AuthenticatedRequest) {
+    return this.organizersService.getStatsByUserId(req.user.userId);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.organizersService.findOne(id);

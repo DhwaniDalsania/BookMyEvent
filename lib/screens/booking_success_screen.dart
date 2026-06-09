@@ -7,10 +7,11 @@ import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import '../data/models/event_model.dart';
 import '../data/models/booking_model.dart';
+import '../data/models/seat_model.dart';
 
 class BookingSuccessScreen extends StatefulWidget {
   final EventModel event;
-  final List<String> selectedSeats;
+  final List<SelectedSeat> selectedSeats;
   final BookingModel booking;
 
   const BookingSuccessScreen({super.key, required this.event, required this.selectedSeats, required this.booking});
@@ -112,7 +113,7 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                                     children: [
                                       Text('Seats', style: AppTextStyles.metadata.copyWith(color: AppColors.mountain)),
                                       Text(
-                                        widget.selectedSeats.join(', '), 
+                                        widget.selectedSeats.map((s) => s.label).join(', '), 
                                         style: AppTextStyles.cardTitle.copyWith(color: AppColors.mahogany),
                                         overflow: TextOverflow.ellipsis,
                                       ),
