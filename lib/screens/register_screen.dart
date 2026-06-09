@@ -25,7 +25,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _organizerNameController = TextEditingController();
   bool _isPasswordVisible = false;
+  String _selectedRole = 'USER';
 
   @override
   void dispose() {
@@ -34,6 +36,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _phoneController.dispose();
+    _organizerNameController.dispose();
     super.dispose();
   }
 
@@ -43,6 +46,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     final phone = _phoneController.text.trim();
+    final organizerName = _organizerNameController.text.trim();
 
     if (first.isEmpty ||
         last.isEmpty ||
@@ -54,10 +58,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       return;
     }
 
+    if (_selectedRole == 'ORGANIZER' && organizerName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a Company / Organizer Name.')),
+      );
+      return;
+    }
+
     try {
-      await ref
-          .read(authProvider.notifier)
-          .register(first, last, email, password, phone);
+      await ref.read(authProvider.notifier).register(
+            firstName: first,
+            lastName: last,
+            email: email,
+            password: password,
+            phone: phone.isEmpty ? null : phone,
+            role: _selectedRole,
+            organizerName: _selectedRole == 'ORGANIZER' ? organizerName : null,
+          );
 
       if (mounted) {
         Navigator.of(context).pushReplacement(
@@ -150,6 +167,97 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
+                            // Premium Role Selector Toggle
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => setState(() => _selectedRole = 'USER'),
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 200),
+                                      padding: const EdgeInsets.symmetric(vertical: 14),
+                                      decoration: BoxDecoration(
+                                        color: _selectedRole == 'USER'
+                                            ? AppColors.mahogany
+                                            : AppColors.surface.withValues(alpha: 0.5),
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: Border.all(
+                                          color: _selectedRole == 'USER'
+                                              ? AppColors.mahogany
+                                              : AppColors.mountain.withValues(alpha: 0.2),
+                                          width: 1.5,
+                                        ),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          'Attendee',
+                                          style: AppTextStyles.bodyLarge.copyWith(
+                                            color: _selectedRole == 'USER' ? Colors.white : AppColors.mahogany,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => setState(() => _selectedRole = 'ORGANIZER'),
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 200),
+                                      padding: const EdgeInsets.symmetric(vertical: 14),
+                                      decoration: BoxDecoration(
+                                        color: _selectedRole == 'ORGANIZER'
+                                            ? AppColors.mahogany
+                                            : AppColors.surface.withValues(alpha: 0.5),
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: Border.all(
+                                          color: _selectedRole == 'ORGANIZER'
+                                              ? AppColors.mahogany
+                                              : AppColors.mountain.withValues(alpha: 0.2),
+                                          width: 1.5,
+                                        ),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          'Organizer',
+                                          style: AppTextStyles.bodyLarge.copyWith(
+                                            color: _selectedRole == 'ORGANIZER' ? Colors.white : AppColors.mahogany,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+
+                            // Company/Organizer Name Field (Only if Organizer role selected)
+                            if (_selectedRole == 'ORGANIZER') ...[
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: AppColors.surface.withValues(alpha: 0.5),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: AppColors.mountain.withValues(alpha: 0.2)),
+                                ),
+                                child: TextField(
+                                  controller: _organizerNameController,
+                                  style: AppTextStyles.bodyLarge.copyWith(color: AppColors.mahogany),
+                                  decoration: InputDecoration(
+                                    hintText: 'Company / Organizer Name',
+                                    hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.mountain),
+                                    prefixIcon: const Icon(Icons.business_outlined, color: AppColors.mahogany),
+                                    border: InputBorder.none,
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                  ),
+                                ),
+                              ).animate().fadeIn(duration: 250.ms).slideY(begin: -0.1, end: 0),
+                              const SizedBox(height: 16),
+                            ],
+
                             // First Name
                             Container(
                               decoration: BoxDecoration(

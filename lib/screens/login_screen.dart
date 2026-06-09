@@ -51,11 +51,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         await ref.read(authProvider.notifier).login(email, password);
       } else {
         await ref.read(authProvider.notifier).register(
-          _firstNameController.text.trim(),
-          _lastNameController.text.trim(),
-          email,
-          password,
-          _phoneController.text.trim(),
+          firstName: _firstNameController.text.trim(),
+          lastName: _lastNameController.text.trim(),
+          email: email,
+          password: password,
+          phone: _phoneController.text.trim(),
+          role: 'USER',
         );
       }
 

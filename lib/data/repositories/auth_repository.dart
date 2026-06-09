@@ -27,14 +27,24 @@ class AuthRepository {
     }
   }
 
-  Future<Map<String, dynamic>> register(String firstName, String lastName, String email, String password, String phone) async {
+  Future<Map<String, dynamic>> register({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String password,
+    String? phone,
+    required String role,
+    String? organizerName,
+  }) async {
     try {
       final Map<String, dynamic> payload = {
         'firstName': firstName,
         'lastName': lastName,
         'email': email,
         'password': password,
-        'phoneNumber': phone,
+        if (phone != null && phone.isNotEmpty) 'phoneNumber': phone,
+        'role': role,
+        if (organizerName != null && organizerName.isNotEmpty) 'organizerName': organizerName,
       };
       final response = await _dio.post('/auth/register', data: payload);
       

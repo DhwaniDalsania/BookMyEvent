@@ -44,10 +44,26 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
     }
   }
 
-  Future<void> register(String first, String last, String email, String pass, String phone) async {
+  Future<void> register({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String password,
+    String? phone,
+    required String role,
+    String? organizerName,
+  }) async {
     state = const AsyncLoading();
     try {
-      await _repository.register(first, last, email, pass, phone);
+      await _repository.register(
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: password,
+        phone: phone,
+        role: role,
+        organizerName: organizerName,
+      );
       final user = await _repository.getMe();
       state = AsyncData(user);
     } catch (e, stack) {

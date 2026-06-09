@@ -70,9 +70,22 @@ let AuthService = class AuthService {
                 email: dto.email,
                 phoneNumber: dto.phoneNumber,
                 passwordHash,
-                role: 'USER',
+                role: dto.role ?? 'USER',
             },
         });
+        if (user.role === 'ORGANIZER') {
+            await this.prisma.organizer.create({
+                data: {
+                    userId: user.id,
+                    name: dto.organizerName || `${dto.firstName} ${dto.lastName} Productions`,
+                    contactEmail: dto.email,
+                    contactPhone: dto.phoneNumber,
+                    isVerified: true,
+                    verificationStatus: 'VERIFIED',
+                    verificationDate: new Date(),
+                },
+            });
+        }
         return this.generateTokens(user);
     }
     async login(dto) {
