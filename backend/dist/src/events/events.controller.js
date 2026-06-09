@@ -36,6 +36,9 @@ let EventsController = class EventsController {
     findOneBySlug(slug) {
         return this.eventsService.findOneBySlug(slug);
     }
+    getSeatMap(id) {
+        return this.eventsService.getSeatMap(id);
+    }
     findOne(id) {
         return this.eventsService.findOne(id);
     }
@@ -83,6 +86,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], EventsController.prototype, "findOneBySlug", null);
+__decorate([
+    (0, common_1.Get)(':id/seat-map'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], EventsController.prototype, "getSeatMap", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),

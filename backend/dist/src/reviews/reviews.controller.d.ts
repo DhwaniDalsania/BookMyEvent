@@ -15,9 +15,9 @@ export declare class ReviewsController {
     }>;
     getEventReviews(eventId: string): Promise<({
         user: {
+            id: string;
             firstName: string;
             lastName: string;
-            id: string;
         };
     } & {
         id: string;

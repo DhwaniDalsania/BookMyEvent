@@ -9,8 +9,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateEventImageDto = exports.QueryEventDto = exports.UpdateEventDto = exports.CreateEventDto = exports.EventStatus = void 0;
+exports.CreateEventImageDto = exports.QueryEventDto = exports.UpdateEventDto = exports.CreateEventDto = exports.CreateTicketTierDto = exports.EventStatus = void 0;
 const class_validator_1 = require("class-validator");
+const class_transformer_1 = require("class-transformer");
 var EventStatus;
 (function (EventStatus) {
     EventStatus["DRAFT"] = "DRAFT";
@@ -18,6 +19,25 @@ var EventStatus;
     EventStatus["CANCELLED"] = "CANCELLED";
     EventStatus["COMPLETED"] = "COMPLETED";
 })(EventStatus || (exports.EventStatus = EventStatus = {}));
+class CreateTicketTierDto {
+    name;
+    price;
+    availableQty;
+}
+exports.CreateTicketTierDto = CreateTicketTierDto;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateTicketTierDto.prototype, "name", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], CreateTicketTierDto.prototype, "price", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], CreateTicketTierDto.prototype, "availableQty", void 0);
 class CreateEventDto {
     title;
     description;
@@ -29,6 +49,7 @@ class CreateEventDto {
     heroImageUrl;
     status;
     isFeatured;
+    ticketTiers;
 }
 exports.CreateEventDto = CreateEventDto;
 __decorate([
@@ -81,6 +102,13 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Boolean)
 ], CreateEventDto.prototype, "isFeatured", void 0);
+__decorate([
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.ValidateNested)({ each: true }),
+    (0, class_transformer_1.Type)(() => CreateTicketTierDto),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], CreateEventDto.prototype, "ticketTiers", void 0);
 class UpdateEventDto {
     title;
     description;

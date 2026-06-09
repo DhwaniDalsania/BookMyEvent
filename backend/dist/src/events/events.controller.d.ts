@@ -4,18 +4,48 @@ export declare class EventsController {
     private readonly eventsService;
     constructor(eventsService: EventsService);
     create(createEventDto: CreateEventDto): Promise<{
+        category: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+            slug: string;
+            iconUrl: string | null;
+        };
+        venue: {
+            id: string;
+            createdAt: Date;
+            name: string;
+            address: string;
+            city: string;
+            state: string;
+            zipCode: string;
+            latitude: import("@prisma/client/runtime/library").Decimal | null;
+            longitude: import("@prisma/client/runtime/library").Decimal | null;
+            googleMapsUrl: string | null;
+            placeId: string | null;
+        };
+        ticketTiers: {
+            id: string;
+            name: string;
+            sectionId: string | null;
+            price: import("@prisma/client/runtime/library").Decimal;
+            availableQty: number;
+            eventId: string;
+        }[];
+    } & {
         id: string;
         createdAt: Date;
         deletedAt: Date | null;
-        slug: string;
         description: string;
+        slug: string;
+        venueId: string;
+        status: import("@prisma/client").$Enums.EventStatus;
         title: string;
         categoryId: string;
-        venueId: string;
         organizerId: string;
         startTime: Date;
         endTime: Date;
-        status: import("@prisma/client").$Enums.EventStatus;
         heroImageUrl: string;
         isFeatured: boolean;
     }>;
@@ -35,6 +65,17 @@ export declare class EventsController {
             verificationStatus: import("@prisma/client").$Enums.VerificationStatus;
             verificationDate: Date | null;
         };
+        metrics: {
+            updatedAt: Date;
+            totalViews: bigint;
+            totalBookings: number;
+            totalTicketsSold: number;
+            wishlistCount: number;
+            reviewCount: number;
+            averageRating: import("@prisma/client/runtime/library").Decimal;
+            revenueGenerated: import("@prisma/client/runtime/library").Decimal;
+            eventId: string;
+        } | null;
         category: {
             id: string;
             createdAt: Date;
@@ -56,19 +97,27 @@ export declare class EventsController {
             googleMapsUrl: string | null;
             placeId: string | null;
         };
+        ticketTiers: {
+            id: string;
+            name: string;
+            sectionId: string | null;
+            price: import("@prisma/client/runtime/library").Decimal;
+            availableQty: number;
+            eventId: string;
+        }[];
     } & {
         id: string;
         createdAt: Date;
         deletedAt: Date | null;
-        slug: string;
         description: string;
+        slug: string;
+        venueId: string;
+        status: import("@prisma/client").$Enums.EventStatus;
         title: string;
         categoryId: string;
-        venueId: string;
         organizerId: string;
         startTime: Date;
         endTime: Date;
-        status: import("@prisma/client").$Enums.EventStatus;
         heroImageUrl: string;
         isFeatured: boolean;
     })[]>;
@@ -88,6 +137,17 @@ export declare class EventsController {
             verificationStatus: import("@prisma/client").$Enums.VerificationStatus;
             verificationDate: Date | null;
         };
+        metrics: {
+            updatedAt: Date;
+            totalViews: bigint;
+            totalBookings: number;
+            totalTicketsSold: number;
+            wishlistCount: number;
+            reviewCount: number;
+            averageRating: import("@prisma/client/runtime/library").Decimal;
+            revenueGenerated: import("@prisma/client/runtime/library").Decimal;
+            eventId: string;
+        } | null;
         category: {
             id: string;
             createdAt: Date;
@@ -109,19 +169,27 @@ export declare class EventsController {
             googleMapsUrl: string | null;
             placeId: string | null;
         };
+        ticketTiers: {
+            id: string;
+            name: string;
+            sectionId: string | null;
+            price: import("@prisma/client/runtime/library").Decimal;
+            availableQty: number;
+            eventId: string;
+        }[];
     } & {
         id: string;
         createdAt: Date;
         deletedAt: Date | null;
-        slug: string;
         description: string;
+        slug: string;
+        venueId: string;
+        status: import("@prisma/client").$Enums.EventStatus;
         title: string;
         categoryId: string;
-        venueId: string;
         organizerId: string;
         startTime: Date;
         endTime: Date;
-        status: import("@prisma/client").$Enums.EventStatus;
         heroImageUrl: string;
         isFeatured: boolean;
     })[]>;
@@ -141,6 +209,17 @@ export declare class EventsController {
             verificationStatus: import("@prisma/client").$Enums.VerificationStatus;
             verificationDate: Date | null;
         };
+        metrics: {
+            updatedAt: Date;
+            totalViews: bigint;
+            totalBookings: number;
+            totalTicketsSold: number;
+            wishlistCount: number;
+            reviewCount: number;
+            averageRating: import("@prisma/client/runtime/library").Decimal;
+            revenueGenerated: import("@prisma/client/runtime/library").Decimal;
+            eventId: string;
+        } | null;
         category: {
             id: string;
             createdAt: Date;
@@ -162,28 +241,59 @@ export declare class EventsController {
             googleMapsUrl: string | null;
             placeId: string | null;
         };
+        ticketTiers: {
+            id: string;
+            name: string;
+            sectionId: string | null;
+            price: import("@prisma/client/runtime/library").Decimal;
+            availableQty: number;
+            eventId: string;
+        }[];
         images: {
             id: string;
             createdAt: Date;
+            eventId: string;
             imageUrl: string;
             sortOrder: number;
-            eventId: string;
         }[];
     } & {
         id: string;
         createdAt: Date;
         deletedAt: Date | null;
-        slug: string;
         description: string;
+        slug: string;
+        venueId: string;
+        status: import("@prisma/client").$Enums.EventStatus;
         title: string;
         categoryId: string;
-        venueId: string;
         organizerId: string;
         startTime: Date;
         endTime: Date;
-        status: import("@prisma/client").$Enums.EventStatus;
         heroImageUrl: string;
         isFeatured: boolean;
+    }>;
+    getSeatMap(id: string): Promise<{
+        eventId: string;
+        venueName: string;
+        rows: number;
+        cols: number;
+        ticketTiers: {
+            id: string;
+            name: string;
+            price: number;
+            availableQty: number;
+        }[];
+        seats: {
+            id: string;
+            rowName: string;
+            seatNumber: string;
+            label: string;
+            sectionName: string;
+            ticketTierId: string | null;
+            ticketTierName: string | null;
+            price: number;
+            status: string;
+        }[];
     }>;
     findOne(id: string): Promise<{
         organizer: {
@@ -201,6 +311,17 @@ export declare class EventsController {
             verificationStatus: import("@prisma/client").$Enums.VerificationStatus;
             verificationDate: Date | null;
         };
+        metrics: {
+            updatedAt: Date;
+            totalViews: bigint;
+            totalBookings: number;
+            totalTicketsSold: number;
+            wishlistCount: number;
+            reviewCount: number;
+            averageRating: import("@prisma/client/runtime/library").Decimal;
+            revenueGenerated: import("@prisma/client/runtime/library").Decimal;
+            eventId: string;
+        } | null;
         category: {
             id: string;
             createdAt: Date;
@@ -222,26 +343,34 @@ export declare class EventsController {
             googleMapsUrl: string | null;
             placeId: string | null;
         };
+        ticketTiers: {
+            id: string;
+            name: string;
+            sectionId: string | null;
+            price: import("@prisma/client/runtime/library").Decimal;
+            availableQty: number;
+            eventId: string;
+        }[];
         images: {
             id: string;
             createdAt: Date;
+            eventId: string;
             imageUrl: string;
             sortOrder: number;
-            eventId: string;
         }[];
     } & {
         id: string;
         createdAt: Date;
         deletedAt: Date | null;
-        slug: string;
         description: string;
+        slug: string;
+        venueId: string;
+        status: import("@prisma/client").$Enums.EventStatus;
         title: string;
         categoryId: string;
-        venueId: string;
         organizerId: string;
         startTime: Date;
         endTime: Date;
-        status: import("@prisma/client").$Enums.EventStatus;
         heroImageUrl: string;
         isFeatured: boolean;
     }>;
@@ -249,15 +378,15 @@ export declare class EventsController {
         id: string;
         createdAt: Date;
         deletedAt: Date | null;
-        slug: string;
         description: string;
+        slug: string;
+        venueId: string;
+        status: import("@prisma/client").$Enums.EventStatus;
         title: string;
         categoryId: string;
-        venueId: string;
         organizerId: string;
         startTime: Date;
         endTime: Date;
-        status: import("@prisma/client").$Enums.EventStatus;
         heroImageUrl: string;
         isFeatured: boolean;
     }>;
@@ -265,30 +394,30 @@ export declare class EventsController {
         id: string;
         createdAt: Date;
         deletedAt: Date | null;
-        slug: string;
         description: string;
+        slug: string;
+        venueId: string;
+        status: import("@prisma/client").$Enums.EventStatus;
         title: string;
         categoryId: string;
-        venueId: string;
         organizerId: string;
         startTime: Date;
         endTime: Date;
-        status: import("@prisma/client").$Enums.EventStatus;
         heroImageUrl: string;
         isFeatured: boolean;
     }>;
     addImage(id: string, dto: CreateEventImageDto): Promise<{
         id: string;
         createdAt: Date;
+        eventId: string;
         imageUrl: string;
         sortOrder: number;
-        eventId: string;
     }>;
     removeImage(imageId: string): Promise<{
         id: string;
         createdAt: Date;
+        eventId: string;
         imageUrl: string;
         sortOrder: number;
-        eventId: string;
     }>;
 }

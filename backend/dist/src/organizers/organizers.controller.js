@@ -33,6 +33,15 @@ let OrganizersController = class OrganizersController {
     findAll() {
         return this.organizersService.findAll();
     }
+    getMyProfile(req) {
+        return this.organizersService.findOneByUserId(req.user.userId);
+    }
+    getMyEvents(req) {
+        return this.organizersService.getEventsByUserId(req.user.userId);
+    }
+    getMyStats(req) {
+        return this.organizersService.getStatsByUserId(req.user.userId);
+    }
     findOne(id) {
         return this.organizersService.findOne(id);
     }
@@ -63,6 +72,33 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], OrganizersController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('ADMIN', 'ORGANIZER'),
+    (0, common_1.Get)('me/profile'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], OrganizersController.prototype, "getMyProfile", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('ADMIN', 'ORGANIZER'),
+    (0, common_1.Get)('me/events'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], OrganizersController.prototype, "getMyEvents", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('ADMIN', 'ORGANIZER'),
+    (0, common_1.Get)('me/stats'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], OrganizersController.prototype, "getMyStats", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),

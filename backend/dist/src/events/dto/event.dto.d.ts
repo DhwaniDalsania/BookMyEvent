@@ -4,6 +4,11 @@ export declare enum EventStatus {
     CANCELLED = "CANCELLED",
     COMPLETED = "COMPLETED"
 }
+export declare class CreateTicketTierDto {
+    name: string;
+    price: number;
+    availableQty: number;
+}
 export declare class CreateEventDto {
     title: string;
     description: string;
@@ -15,6 +20,7 @@ export declare class CreateEventDto {
     heroImageUrl: string;
     status?: EventStatus;
     isFeatured?: boolean;
+    ticketTiers?: CreateTicketTierDto[];
 }
 export declare class UpdateEventDto {
     title?: string;

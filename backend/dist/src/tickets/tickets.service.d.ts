@@ -4,28 +4,43 @@ export declare class TicketsService {
     constructor(prisma: PrismaService);
     generateQrHash(bookingRef: string, seatId: string, uuid: string): string;
     findOne(id: string): Promise<{
+        ticketSeat: ({
+            seat: {
+                id: string;
+                venueId: string;
+                sectionId: string;
+                rowName: string;
+                seatNumber: string;
+                seatType: string;
+                status: import("@prisma/client").$Enums.SeatStatus;
+            };
+        } & {
+            id: string;
+            ticketId: string;
+            seatId: string;
+        }) | null;
         ticketTier: {
             id: string;
             name: string;
-            eventId: string;
             sectionId: string | null;
             price: import("@prisma/client/runtime/library").Decimal;
             availableQty: number;
+            eventId: string;
         };
         booking: {
             event: {
                 id: string;
                 createdAt: Date;
                 deletedAt: Date | null;
-                slug: string;
                 description: string;
+                slug: string;
+                venueId: string;
+                status: import("@prisma/client").$Enums.EventStatus;
                 title: string;
                 categoryId: string;
-                venueId: string;
                 organizerId: string;
                 startTime: Date;
                 endTime: Date;
-                status: import("@prisma/client").$Enums.EventStatus;
                 heroImageUrl: string;
                 isFeatured: boolean;
             };
@@ -34,27 +49,12 @@ export declare class TicketsService {
             createdAt: Date;
             userId: string;
             status: import("@prisma/client").$Enums.BookingStatus;
-            eventId: string;
-            bookingRef: string;
+            finalAmount: import("@prisma/client/runtime/library").Decimal;
             totalAmount: import("@prisma/client/runtime/library").Decimal;
             discountAmount: import("@prisma/client/runtime/library").Decimal;
-            finalAmount: import("@prisma/client/runtime/library").Decimal;
+            eventId: string;
+            bookingRef: string;
         };
-        ticketSeat: ({
-            seat: {
-                id: string;
-                venueId: string;
-                status: import("@prisma/client").$Enums.SeatStatus;
-                sectionId: string;
-                rowName: string;
-                seatNumber: string;
-                seatType: string;
-            };
-        } & {
-            id: string;
-            seatId: string;
-            ticketId: string;
-        }) | null;
     } & {
         id: string;
         status: import("@prisma/client").$Enums.TicketStatus;
@@ -63,28 +63,43 @@ export declare class TicketsService {
         qrCodeHash: string;
     }>;
     findByUserId(userId: string): Promise<({
+        ticketSeat: ({
+            seat: {
+                id: string;
+                venueId: string;
+                sectionId: string;
+                rowName: string;
+                seatNumber: string;
+                seatType: string;
+                status: import("@prisma/client").$Enums.SeatStatus;
+            };
+        } & {
+            id: string;
+            ticketId: string;
+            seatId: string;
+        }) | null;
         ticketTier: {
             id: string;
             name: string;
-            eventId: string;
             sectionId: string | null;
             price: import("@prisma/client/runtime/library").Decimal;
             availableQty: number;
+            eventId: string;
         };
         booking: {
             event: {
                 id: string;
                 createdAt: Date;
                 deletedAt: Date | null;
-                slug: string;
                 description: string;
+                slug: string;
+                venueId: string;
+                status: import("@prisma/client").$Enums.EventStatus;
                 title: string;
                 categoryId: string;
-                venueId: string;
                 organizerId: string;
                 startTime: Date;
                 endTime: Date;
-                status: import("@prisma/client").$Enums.EventStatus;
                 heroImageUrl: string;
                 isFeatured: boolean;
             };
@@ -93,27 +108,12 @@ export declare class TicketsService {
             createdAt: Date;
             userId: string;
             status: import("@prisma/client").$Enums.BookingStatus;
-            eventId: string;
-            bookingRef: string;
+            finalAmount: import("@prisma/client/runtime/library").Decimal;
             totalAmount: import("@prisma/client/runtime/library").Decimal;
             discountAmount: import("@prisma/client/runtime/library").Decimal;
-            finalAmount: import("@prisma/client/runtime/library").Decimal;
+            eventId: string;
+            bookingRef: string;
         };
-        ticketSeat: ({
-            seat: {
-                id: string;
-                venueId: string;
-                status: import("@prisma/client").$Enums.SeatStatus;
-                sectionId: string;
-                rowName: string;
-                seatNumber: string;
-                seatType: string;
-            };
-        } & {
-            id: string;
-            seatId: string;
-            ticketId: string;
-        }) | null;
     } & {
         id: string;
         status: import("@prisma/client").$Enums.TicketStatus;

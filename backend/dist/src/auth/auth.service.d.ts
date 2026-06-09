@@ -2,6 +2,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 export declare class AuthService {
     private prisma;
     private jwtService;
@@ -40,13 +41,46 @@ export declare class AuthService {
         };
     }>;
     getMe(userId: string): Promise<{
+        id: string;
+        email: string;
         firstName: string;
         lastName: string;
-        email: string;
         phoneNumber: string | null;
-        id: string;
+        profileImageUrl: string | null;
         role: import("@prisma/client").$Enums.Role;
         createdAt: Date;
+        organizer: {
+            id: string;
+            name: string;
+        } | null;
+    }>;
+    updateMe(userId: string, dto: UpdateProfileDto): Promise<{
+        id: string;
+        email: string;
+        firstName: string;
+        lastName: string;
+        phoneNumber: string | null;
+        profileImageUrl: string | null;
+        role: import("@prisma/client").$Enums.Role;
+        createdAt: Date;
+        organizer: {
+            id: string;
+            name: string;
+        } | null;
+    }>;
+    updateProfile(userId: string, dto: UpdateProfileDto): Promise<{
+        id: string;
+        email: string;
+        firstName: string;
+        lastName: string;
+        phoneNumber: string | null;
+        profileImageUrl: string | null;
+        role: import("@prisma/client").$Enums.Role;
+        createdAt: Date;
+        organizer: {
+            id: string;
+            name: string;
+        } | null;
     }>;
     private generateTokens;
 }

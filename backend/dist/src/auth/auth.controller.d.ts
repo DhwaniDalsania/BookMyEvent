@@ -2,6 +2,7 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
@@ -42,12 +43,31 @@ export declare class AuthController {
         message: string;
     }>;
     getMe(req: any): Promise<{
+        id: string;
+        email: string;
         firstName: string;
         lastName: string;
-        email: string;
         phoneNumber: string | null;
-        id: string;
+        profileImageUrl: string | null;
         role: import("@prisma/client").$Enums.Role;
         createdAt: Date;
+        organizer: {
+            id: string;
+            name: string;
+        } | null;
+    }>;
+    updateMe(req: any, dto: UpdateProfileDto): Promise<{
+        id: string;
+        email: string;
+        firstName: string;
+        lastName: string;
+        phoneNumber: string | null;
+        profileImageUrl: string | null;
+        role: import("@prisma/client").$Enums.Role;
+        createdAt: Date;
+        organizer: {
+            id: string;
+            name: string;
+        } | null;
     }>;
 }

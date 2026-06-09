@@ -64,7 +64,45 @@ let OrganizersService = class OrganizersService {
         await this.findOne(organizerId);
         return this.prisma.event.findMany({
             where: { organizerId },
+            include: {
+                ticketTiers: { orderBy: { price: 'asc' } },
+                metrics: true,
+                venue: true,
+                category: true,
+            },
+            orderBy: { startTime: 'desc' },
         });
+    }
+    async getEventsByUserId(userId) {
+        const organizer = await this.findOneByUserId(userId);
+        return this.getEvents(organizer.id);
+    }
+    async getStatsByUserId(userId) {
+        const organizer = await this.findOneByUserId(userId);
+        const events = await this.prisma.event.findMany({
+            where: { organizerId: organizer.id },
+            include: { metrics: true },
+        });
+        const bookings = await this.prisma.booking.count({
+            where: {
+                event: { organizerId: organizer.id },
+                status: 'CONFIRMED',
+            },
+        });
+        const revenue = await this.prisma.booking.aggregate({
+            where: {
+                event: { organizerId: organizer.id },
+                status: 'CONFIRMED',
+            },
+            _sum: { finalAmount: true },
+        });
+        return {
+            organizer,
+            eventCount: events.length,
+            bookingCount: bookings,
+            totalRevenue: Number(revenue._sum.finalAmount ?? 0),
+            events,
+        };
     }
 };
 exports.OrganizersService = OrganizersService;

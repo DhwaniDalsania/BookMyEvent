@@ -116,13 +116,40 @@ let AuthService = class AuthService {
                 email: true,
                 phoneNumber: true,
                 role: true,
+                profileImageUrl: true,
                 createdAt: true,
+                organizer: {
+                    select: { id: true, name: true },
+                },
             },
         });
         if (!user) {
             throw new common_1.UnauthorizedException('User not found');
         }
         return user;
+    }
+    async updateMe(userId, dto) {
+        const user = await this.prisma.user.update({
+            where: { id: userId },
+            data: dto,
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                phoneNumber: true,
+                role: true,
+                profileImageUrl: true,
+                createdAt: true,
+                organizer: {
+                    select: { id: true, name: true },
+                },
+            },
+        });
+        return user;
+    }
+    async updateProfile(userId, dto) {
+        return this.updateMe(userId, dto);
     }
     async generateTokens(user) {
         const payload = { email: user.email, sub: user.id, role: user.role };

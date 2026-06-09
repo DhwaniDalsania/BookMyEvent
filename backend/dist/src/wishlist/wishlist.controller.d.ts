@@ -42,15 +42,15 @@ export declare class WishlistController {
             id: string;
             createdAt: Date;
             deletedAt: Date | null;
-            slug: string;
             description: string;
+            slug: string;
+            venueId: string;
+            status: import("@prisma/client").$Enums.EventStatus;
             title: string;
             categoryId: string;
-            venueId: string;
             organizerId: string;
             startTime: Date;
             endTime: Date;
-            status: import("@prisma/client").$Enums.EventStatus;
             heroImageUrl: string;
             isFeatured: boolean;
         };
