@@ -107,9 +107,13 @@ export class PaymentsService {
     if (expectedSignature !== dto.razorpaySignature) {
       // Fallback: check stored webhook signature if available
       const webhook = await this.prisma.paymentWebhook.findFirst({
-        where: { razorpayOrderId: dto.razorpayOrderId },
-        orderBy: { createdAt: 'desc' },
-      });
+          where: {
+            payment: {
+              razorpayOrderId: dto.razorpayOrderId,
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+        });
       if (webhook && webhook.razorpaySignature === dto.razorpaySignature) {
         // Consider verification valid via webhook
         console.warn('Signature mismatch but verified via stored webhook data');
