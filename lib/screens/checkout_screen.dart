@@ -15,6 +15,7 @@ import '../providers/auth_provider.dart';
 import '../providers/booking_provider.dart';
 import '../providers/payment_provider.dart';
 import '../widgets/images/cached_hero_image.dart';
+import '../utils/error_handler.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   final EventModel event;
@@ -127,7 +128,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       };
       _razorpay.open(options);
     } catch (e) {
-      _showError('Failed to initiate payment: $e');
+      final errorMessage = ErrorHandler.getErrorMessage(e);
+      _showError('Failed to initiate payment: $errorMessage');
       setState(() => _isProcessing = false);
     }
   }

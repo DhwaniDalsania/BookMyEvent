@@ -11,6 +11,7 @@ import '../data/models/event_model.dart';
 import '../data/models/seat_model.dart';
 import '../providers/booking_provider.dart';
 import '../providers/seat_provider.dart';
+import '../utils/error_handler.dart';
 
 class SeatSelectionScreen extends ConsumerStatefulWidget {
   final EventModel event;
@@ -369,8 +370,9 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
     } catch (e) {
       if (!mounted) return;
       Navigator.pop(context);
+      final errorMessage = ErrorHandler.getErrorMessage(e);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to lock seats: $e')),
+        SnackBar(content: Text('Failed to lock seats: $errorMessage')),
       );
     }
   }

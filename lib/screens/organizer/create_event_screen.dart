@@ -9,6 +9,7 @@ import '../../data/repositories/event_repository.dart';
 import '../../data/models/category_model.dart';
 import '../../providers/event_provider.dart';
 import '../../providers/organizer_provider.dart';
+import '../../utils/error_handler.dart';
 import 'dart:ui';
 
 class CreateEventScreen extends ConsumerStatefulWidget {
@@ -63,8 +64,9 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
+        final errorMessage = ErrorHandler.getErrorMessage(e);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load form data: $e')),
+          SnackBar(content: Text('Failed to load form data: $errorMessage')),
         );
       }
     }
@@ -150,8 +152,9 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
       }
     } catch (e) {
       if (mounted) {
+        final errorMessage = ErrorHandler.getErrorMessage(e);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to publish event: $e')),
+          SnackBar(content: Text('Failed to publish event: $errorMessage')),
         );
       }
     } finally {
