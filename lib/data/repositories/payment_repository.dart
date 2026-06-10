@@ -14,13 +14,13 @@ class PaymentRepository {
   Future<bool> verifyPayment(String bookingId, String razorpayPaymentId, String razorpayOrderId, String razorpaySignature) async {
     try {
       await _dio.post('/payments/verify', data: {
-        'bookingId': bookingId,
         'razorpayPaymentId': razorpayPaymentId,
         'razorpayOrderId': razorpayOrderId,
         'razorpaySignature': razorpaySignature,
       });
       return true;
     } catch (e) {
+      print('Payment verification failed: $e');
       return false;
     }
   }
