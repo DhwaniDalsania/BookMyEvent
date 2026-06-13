@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../../core/network/api_client.dart';
 
 class PaymentRepository {
@@ -20,7 +21,7 @@ class PaymentRepository {
       });
       return true;
     } catch (e) {
-      print('Payment verification failed: $e');
+      debugPrint('Payment verification failed: $e');
       return false;
     }
   }

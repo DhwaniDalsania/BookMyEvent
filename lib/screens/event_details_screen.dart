@@ -1,10 +1,7 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
-import '../widgets/buttons/glass_button.dart';
 import 'seat_selection_screen.dart';
 import '../widgets/cards/event_card.dart';
 import '../data/models/event_model.dart';
@@ -73,17 +70,17 @@ class EventDetailsScreen extends ConsumerWidget {
                 pinned: true,
                 leading: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: GlassButton(
-                    icon: Icons.arrow_back,
-                    onTap: () => Navigator.pop(context),
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    onPressed: () => Navigator.pop(context),
                   ),
                 ),
                 actions: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: GlassButton(
-                      icon: isSaved ? Icons.favorite : Icons.favorite_border,
-                      onTap: () async {
+                    child: IconButton(
+                      icon: Icon(isSaved ? Icons.favorite : Icons.favorite_border, color: Colors.white),
+                      onPressed: () async {
                         final user = ref.read(authProvider).value;
                         if (user == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -129,7 +126,7 @@ class EventDetailsScreen extends ConsumerWidget {
                               color: AppColors.gold,
                               borderRadius: BorderRadius.circular(12),
                             ),
-                          child: Text(
+                            child: Text(
                               event.categoryName.toUpperCase(),
                               style: AppTextStyles.metadata.copyWith(color: AppColors.mahogany, fontWeight: FontWeight.bold),
                             ),
@@ -140,75 +137,69 @@ class EventDetailsScreen extends ConsumerWidget {
                             style: AppTextStyles.metadata.copyWith(color: Colors.white, fontSize: 13, letterSpacing: 2),
                           ),
                         ],
-                      ).animate().fadeIn().slideY(begin: 0.2),
+                      ),
                       
                       const SizedBox(height: 16),
                       
                       Text(
                         event.title,
                         style: AppTextStyles.heroTitle.copyWith(color: Colors.white, fontSize: 48),
-                      ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.2),
+                      ),
                       
                       const SizedBox(height: 32),
                       
-                      // Floating Glass Panel for Details
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(32),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                          child: Container(
-                            padding: const EdgeInsets.all(24),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.05),
-                              borderRadius: BorderRadius.circular(32),
-                              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                      // Simplified details container without glass effect
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
                               children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.gold.withValues(alpha: 0.2),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(Icons.location_on, color: AppColors.gold),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            event.locationName,
-                                            style: AppTextStyles.cardTitle.copyWith(color: Colors.white, fontSize: 18),
-                                          ),
-                                          Text(
-                                            event.locationName,
-                                            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mountain),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 24),
-                                  child: Divider(color: Colors.white24, height: 1),
-                                ),
-                                Text('About', style: AppTextStyles.sectionHeader.copyWith(color: Colors.white, fontSize: 24)),
-                                const SizedBox(height: 12),
-                                  Text(
-                                    event.description.isNotEmpty ? event.description : 'Experience the biggest event of the year with exclusive performances and a vibrant atmosphere.',
-                                    style: AppTextStyles.bodyCopy.copyWith(color: AppColors.vanilla.withValues(alpha: 0.8), height: 1.6),
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.gold.withValues(alpha: 0.2),
+                                    shape: BoxShape.circle,
                                   ),
+                                  child: const Icon(Icons.location_on, color: AppColors.gold),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        event.locationName,
+                                        style: AppTextStyles.cardTitle.copyWith(color: Colors.white, fontSize: 18),
+                                      ),
+                                      Text(
+                                        event.locationName,
+                                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mountain),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
-                          ),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 24),
+                              child: Divider(color: Colors.white24, height: 1),
+                            ),
+                            Text('About', style: AppTextStyles.sectionHeader.copyWith(color: Colors.white, fontSize: 24)),
+                            const SizedBox(height: 12),
+                            Text(
+                              event.description.isNotEmpty ? event.description : 'Experience the biggest event of the year with exclusive performances and a vibrant atmosphere.',
+                              style: AppTextStyles.bodyCopy.copyWith(color: AppColors.vanilla.withValues(alpha: 0.8), height: 1.6),
+                            ),
+                          ],
                         ),
-                      ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2),
+                      ),
 
                       const SizedBox(height: 40),
 
@@ -230,7 +221,7 @@ class EventDetailsScreen extends ConsumerWidget {
                             child: const Center(child: Text('+3', style: TextStyle(color: AppColors.gold, fontWeight: FontWeight.bold))),
                           ),
                         ],
-                      ).animate().fadeIn(delay: 300.ms),
+                      ),
 
                       const SizedBox(height: 48),
 
@@ -278,83 +269,77 @@ class EventDetailsScreen extends ConsumerWidget {
             bottom: 32,
             left: 24,
             right: 24,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(40),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Container(
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: AppColors.gold,
-                    borderRadius: BorderRadius.circular(40),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.gold.withValues(alpha: 0.3),
-                        blurRadius: 30,
-                        offset: const Offset(0, 10),
-                      )
-                    ],
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(40),
-                      onTap: () {
-                        final user = ref.read(authProvider).value;
-                        if (user == null) {
-                          showDialog(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                              title: const Text('Sign in required'),
-                              content: const Text('Please sign in to book tickets for this event.'),
-                              actions: [
-                                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(ctx);
-                                    Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
-                                  },
-                                  child: const Text('Sign In'),
-                                ),
-                              ],
+            child: Container(
+              height: 80,
+              decoration: BoxDecoration(
+                color: AppColors.gold,
+                borderRadius: BorderRadius.circular(40),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.gold.withValues(alpha: 0.3),
+                    blurRadius: 30,
+                    offset: const Offset(0, 10),
+                  )
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(40),
+                  onTap: () {
+                    final user = ref.read(authProvider).value;
+                    if (user == null) {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Sign in required'),
+                          content: const Text('Please sign in to book tickets for this event.'),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(ctx);
+                                Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+                              },
+                              child: const Text('Sign In'),
                             ),
-                          );
-                          return;
-                        }
-                        _showQuantitySelector(context, ref);
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'BOOK TICKETS',
-                            style: AppTextStyles.button.copyWith(
-                              color: AppColors.mahogany, 
-                              fontWeight: FontWeight.w900, 
-                              fontSize: 18, 
-                              letterSpacing: 2
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: AppColors.mahogany,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              '₹${event.startingPrice.toInt()}',
-                              style: AppTextStyles.button.copyWith(color: AppColors.gold, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
+                      );
+                      return;
+                    }
+                    _showQuantitySelector(context, ref);
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'BOOK TICKETS',
+                        style: AppTextStyles.button.copyWith(
+                          color: AppColors.mahogany, 
+                          fontWeight: FontWeight.w900, 
+                          fontSize: 18, 
+                          letterSpacing: 2
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: AppColors.mahogany,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          '₹${event.startingPrice.toInt()}',
+                          style: AppTextStyles.button.copyWith(color: AppColors.gold, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-          ).animate().slideY(begin: 1.0, curve: Curves.easeOutExpo, duration: 800.ms),
+          ),
         ],
       ),
     );

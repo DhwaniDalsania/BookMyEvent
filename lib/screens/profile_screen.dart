@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
-import 'dart:ui';
 import 'package:image_picker/image_picker.dart';
 import '../data/repositories/upload_repository.dart';
 import 'login_screen.dart';
@@ -67,22 +65,19 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                       ),
                       Positioned.fill(
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.bottomCenter,
-                                end: Alignment.topCenter,
-                                colors: [
-                                  AppColors.background,
-                                  AppColors.background.withValues(alpha: 0.5),
-                                  Colors.transparent,
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
+                        child: Container(
+  decoration: BoxDecoration(
+    gradient: LinearGradient(
+      begin: Alignment.bottomCenter,
+      end: Alignment.topCenter,
+      colors: [
+        AppColors.background,
+        AppColors.background.withValues(alpha: 0.5),
+        Colors.transparent,
+      ],
+    ),
+  ),
+),
                       ),
                       Positioned(
                         bottom: 40,
@@ -134,12 +129,12 @@ class ProfileScreen extends ConsumerWidget {
                                   ),
                                 ),
                               ),
-                            ).animate().scale(delay: 100.ms, duration: 400.ms, curve: Curves.easeOutBack),
+                            ),
                             const SizedBox(height: 24),
                             Text(
                               user != null ? user.displayName : 'Guest',
                               style: AppTextStyles.heroTitle.copyWith(fontSize: 32, color: AppColors.mahogany),
-                            ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2),
+                            ),
                             const SizedBox(height: 8),
                             if (user != null)
                               Text(
@@ -392,6 +387,7 @@ class ProfileScreen extends ConsumerWidget {
                             controller.text = uploadedUrl;
                           });
                         } catch (e) {
+                          if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('Failed to upload image: $e')),
                           );

@@ -3,7 +3,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/event_provider.dart';
 import '../data/models/event_model.dart';
-import 'dart:ui';
 import 'dart:async';
 import 'package:intl/intl.dart';
 
@@ -12,8 +11,8 @@ import '../providers/navigation_provider.dart';
 import '../theme/app_text_styles.dart';
 import '../widgets/cards/event_card.dart';
 import '../widgets/cards/category_card.dart';
-import '../widgets/buttons/glass_button.dart';
 import '../widgets/images/cached_hero_image.dart';
+import '../widgets/inputs/custom_search_bar.dart';
 import 'event_details_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -79,10 +78,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: CustomScrollView(
         controller: _scrollController,
         slivers: [
-          // 1. Cinematic Hero Section
           SliverToBoxAdapter(
             child: SizedBox(
-              height: MediaQuery.of(context).size.height * 0.75, // 75% of screen
+              height: 600,
               child: Stack(
                 children: [
                   PageView.builder(
@@ -91,98 +89,74 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     itemCount: heroEvents.length,
                     itemBuilder: (context, index) {
                       final event = heroEvents[index];
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              pageBuilder: (context, animation, secondaryAnimation) => EventDetailsScreen(event: event),
-                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                return FadeTransition(opacity: animation, child: child);
-                              },
-                              transitionDuration: const Duration(milliseconds: 600),
-                            ),
-                          );
-                        },
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            CachedHeroImage(
-                              imageUrl: event.heroImageUrl ?? 'https://images.unsplash.com/photo-1540039155732-d68f126d40ee?q=80&w=600&auto=format&fit=crop',
-                              fit: BoxFit.cover,
-                              fallbackAsset: 'assets/images/placeholder_hero.jpg',
-                            ),
-                            // Vignette overlay
-                            Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.bottomCenter,
-                                  end: Alignment.topCenter,
-                                  colors: [
-                                    AppColors.cinematicDarkOverlay.withValues(alpha: 0.95),
-                                    AppColors.cinematicDarkOverlay.withValues(alpha: 0.2),
-                                    Colors.transparent,
-                                  ],
-                                  stops: const [0.0, 0.5, 1.0],
-                                ),
+                      return Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          CachedHeroImage(imageUrl: event.heroImageUrl ?? ''),
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [Colors.transparent, Colors.black.withValues(alpha: 0.8)],
                               ),
                             ),
-                            Positioned(
-                              bottom: 120,
-                              left: 32,
-                              right: 32,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(color: AppColors.gold, width: 1.5),
-                                          borderRadius: BorderRadius.circular(20),
-                                        ),
-                                        child: Text(
-                                          'PREMIERE',
-                                          style: AppTextStyles.metadata.copyWith(color: AppColors.gold, letterSpacing: 2),
-                                        ),
+                          ),
+                          Positioned(
+                            bottom: 120,
+                            left: 32,
+                            right: 32,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: AppColors.gold, width: 1.5),
+                                        borderRadius: BorderRadius.circular(20),
                                       ),
-                                    ],
-                                  ).animate().fadeIn().slideY(begin: 0.2),
-                                  const SizedBox(height: 20),
-                                  Text(
-                                    event.title,
-                                    style: AppTextStyles.heroTitle.copyWith(
-                                      color: Colors.white,
-                                      fontSize: 60,
-                                      height: 1.05,
+                                      child: Text(
+                                        'PREMIERE',
+                                        style: AppTextStyles.metadata.copyWith(color: AppColors.gold, letterSpacing: 2),
+                                      ),
                                     ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ).animate().fadeIn(delay: 150.ms).slideY(begin: 0.2),
-                                  const SizedBox(height: 16),
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.location_on, color: AppColors.vanilla, size: 16),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        event.locationName.toUpperCase(),
-                                        style: AppTextStyles.metadata.copyWith(color: AppColors.vanilla, fontSize: 13),
-                                      ),
-                                      const SizedBox(width: 16),
-                                      Container(width: 4, height: 4, decoration: const BoxDecoration(color: AppColors.gold, shape: BoxShape.circle)),
-                                      const SizedBox(width: 16),
-                                      Text(
-                                        DateFormat('MMM d').format(event.startTime).toUpperCase(),
-                                        style: AppTextStyles.metadata.copyWith(color: AppColors.vanilla, fontSize: 13),
-                                      ),
-                                    ],
-                                  ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.2),
-                                ],
-                              ),
+                                  ],
+                                ).animate().fadeIn().slideY(begin: 0.2),
+                                const SizedBox(height: 20),
+                                Text(
+                                  event.title,
+                                  style: AppTextStyles.heroTitle.copyWith(
+                                    color: Colors.white,
+                                    fontSize: 60,
+                                    height: 1.05,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ).animate().fadeIn(delay: 150.ms).slideY(begin: 0.2),
+                                const SizedBox(height: 16),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.location_on, color: AppColors.vanilla, size: 16),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      event.locationName.toUpperCase(),
+                                      style: AppTextStyles.metadata.copyWith(color: AppColors.vanilla, fontSize: 13),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Container(width: 4, height: 4, decoration: const BoxDecoration(color: AppColors.gold, shape: BoxShape.circle)),
+                                    const SizedBox(width: 16),
+                                    Text(
+                                      DateFormat('MMM d').format(event.startTime).toUpperCase(),
+                                      style: AppTextStyles.metadata.copyWith(color: AppColors.vanilla, fontSize: 13),
+                                    ),
+                                  ],
+                                ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.2),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       );
                     },
                   ),
@@ -201,11 +175,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           color: Colors.white,
                           loadingBuilder: (context, child, loadingProgress) { if (loadingProgress == null) return child; return Container(color: Colors.grey[900], child: const Center(child: CircularProgressIndicator(color: Colors.white24, strokeWidth: 2))); }, errorBuilder: (context, error, stackTrace) => const Text('BOOKMYEVENT', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 3)),
                         ),
-                        GlassButton(
-                          icon: Icons.person,
-                          onTap: () => ref.read(navigationIndexProvider.notifier).state = 3,
-                          size: 48,
-                        ),
+                        IconButton(
+  icon: Icon(Icons.person, color: Colors.white),
+  onPressed: () => ref.read(navigationIndexProvider.notifier).state = 3,
+),
                       ],
                     ),
                   ),
@@ -233,8 +206,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             ),
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () {
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white.withValues(alpha: 0.15),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                          ),
+                          onPressed: () {
                             if (heroEvents.isNotEmpty) {
                               Navigator.push(
                                 context,
@@ -248,21 +227,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               );
                             }
                           },
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(30),
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(30),
-                                  border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
-                                ),
-                                child: Text('VIEW EVENT', style: AppTextStyles.button.copyWith(color: Colors.white)),
-                              ),
-                            ),
-                          ),
+                          child: Text('VIEW EVENT', style: AppTextStyles.button),
                         ),
                       ],
                     ),
@@ -272,7 +237,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           
-          const SliverToBoxAdapter(child: SizedBox(height: 64)),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 16.0),
+              child: CustomSearchBar(
+                hintText: 'Search artists, venues, events...',
+                onSubmitted: (query) {
+                  ref.read(searchQueryProvider.notifier).state = query;
+                  ref.read(navigationIndexProvider.notifier).state = 1;
+                },
+              ),
+            ),
+          ),
 
           // 2. Curated Experiences (Editorial Style)
           SliverToBoxAdapter(

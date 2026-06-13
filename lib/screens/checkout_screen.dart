@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-// font_awesome not needed for current payment methods
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:intl/intl.dart';
@@ -307,7 +305,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   ),
                 ],
               ),
-            ).animate().fadeIn().slideY(begin: 0.1),
+            ),
 
             const SizedBox(height: 32),
 
@@ -322,7 +320,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   style: AppTextStyles.metadata.copyWith(color: AppColors.mountain, letterSpacing: 2),
                 ),
               ],
-            ).animate().fadeIn(delay: 200.ms),
+            ),
 
             const SizedBox(height: 32),
 
@@ -330,7 +328,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             Text(
               'Select Payment Method',
               style: AppTextStyles.sectionHeader.copyWith(color: AppColors.mahogany),
-            ).animate().fadeIn(delay: 300.ms),
+            ),
             
             const SizedBox(height: 24),
 
@@ -414,7 +412,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     return GestureDetector(
       onTap: () => setState(() => _selectedPaymentMethod = id),
       child: AnimatedContainer(
-        duration: 300.ms,
+        duration: const Duration(milliseconds: 300),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         decoration: BoxDecoration(
           color: isSelected ? Colors.white : AppColors.sand.withValues(alpha: 0.3),
@@ -471,7 +469,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             ),
           ],
         ),
-      ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1),
+      ),
     );
   }
 }

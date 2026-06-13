@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/app_text_styles.dart';
 
 class PrimaryButton extends StatelessWidget {
   final String text;
@@ -27,7 +28,7 @@ class PrimaryButton extends StatelessWidget {
           backgroundColor: AppColors.mahogany,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(24),
           ),
         ),
         onPressed: isLoading ? () {} : onPressed,
@@ -48,7 +49,7 @@ class PrimaryButton extends StatelessWidget {
                     Icon(icon, size: 20),
                     const SizedBox(width: 8),
                   ],
-                  Text(text),
+                  Text(text, style: AppTextStyles.button),
                 ],
               ),
       ),

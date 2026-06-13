@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
-import '../../widgets/layout/luxury_background.dart';
 import '../../widgets/buttons/primary_button.dart';
 import '../../data/repositories/organizer_repository.dart';
 import '../../data/repositories/event_repository.dart';
@@ -11,7 +10,6 @@ import '../../data/models/event_model.dart';
 import '../../providers/event_provider.dart';
 import '../../providers/organizer_provider.dart';
 import '../../utils/error_handler.dart';
-import 'dart:ui';
 import 'package:image_picker/image_picker.dart';
 import '../../data/repositories/upload_repository.dart';
 
@@ -211,136 +209,142 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.background,
         elevation: 0,
-        title: Text(widget.event != null ? 'Edit Event' : 'Create New Event'),
+        title: Text(
+          widget.event != null ? 'Edit Event' : 'Create New Event',
+          style: AppTextStyles.sectionHeader.copyWith(
+            color: AppColors.mahogany,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
+        iconTheme: const IconThemeData(color: AppColors.mahogany),
       ),
-      body: LuxuryBackground(
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SafeArea(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildGlassTextField('Event Title', 'Enter event name', Icons.title, controller: _titleController),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildTapField(
-                              'Date',
-                              '${_startDate.day}/${_startDate.month}/${_startDate.year}',
-                              Icons.calendar_today,
-                              _pickDate,
-                            ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator(color: AppColors.mahogany))
+          : SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildGlassTextField('Event Title', 'Enter event name', Icons.title, controller: _titleController),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildTapField(
+                            'Date',
+                            '${_startDate.day}/${_startDate.month}/${_startDate.year}',
+                            Icons.calendar_today,
+                            _pickDate,
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildTapField(
-                              'Time',
-                              _startTime.format(context),
-                              Icons.access_time,
-                              _pickTime,
-                            ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: _buildTapField(
+                            'Time',
+                            _startTime.format(context),
+                            Icons.access_time,
+                            _pickTime,
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      _buildDropdown(
-                        'Category',
-                        _categoryId,
-                        _categories.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))).toList(),
-                        (v) => setState(() => _categoryId = v),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildDropdown(
-                        'Venue',
-                        _venueId,
-                        [
-                          ..._venues.map((v) => DropdownMenuItem(
-                            value: v['id'] as String,
-                            child: Text('${v['name']} — ${v['city']}'),
-                          )),
-                          const DropdownMenuItem(
-                            value: 'ADD_CUSTOM',
-                            child: Row(
-                              children: [
-                                Icon(Icons.add, color: AppColors.gold, size: 18),
-                                SizedBox(width: 8),
-                                Text('Add Custom Venue...', style: TextStyle(color: AppColors.gold, fontWeight: FontWeight.bold)),
-                              ],
-                            ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    _buildDropdown(
+                      'Category',
+                      _categoryId,
+                      _categories.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))).toList(),
+                      (v) => setState(() => _categoryId = v),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildDropdown(
+                      'Venue',
+                      _venueId,
+                      [
+                        ..._venues.map((v) => DropdownMenuItem(
+                          value: v['id'] as String,
+                          child: Text('${v['name']} — ${v['city']}'),
+                        )),
+                        const DropdownMenuItem(
+                          value: 'ADD_CUSTOM',
+                          child: Row(
+                            children: [
+                              Icon(Icons.add, color: AppColors.gold, size: 18),
+                              SizedBox(width: 8),
+                              Text('Add Custom Venue...', style: TextStyle(color: AppColors.gold, fontWeight: FontWeight.bold)),
+                            ],
                           ),
-                        ],
-                        (v) {
-                          if (v == 'ADD_CUSTOM') {
-                            _showAddVenueDialog(context);
-                          } else {
-                            setState(() => _venueId = v);
+                        ),
+                      ],
+                      (v) {
+                        if (v == 'ADD_CUSTOM') {
+                          _showAddVenueDialog(context);
+                        } else {
+                          setState(() => _venueId = v);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    _buildGlassTextField('Ticket Price (₹)', '999', Icons.confirmation_number,
+                        controller: _priceController, keyboardType: TextInputType.number),
+                    const SizedBox(height: 16),
+                    _buildGlassTextField(
+                      'Banner Image URL',
+                      'https://...',
+                      Icons.image,
+                      controller: _imageUrlController,
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.photo_library, color: AppColors.gold),
+                        onPressed: () async {
+                          final ImagePicker picker = ImagePicker();
+                          final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+                          if (image != null) {
+                            try {
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Uploading cover image...')),
+                              );
+                              final uploadedUrl = await UploadRepository().uploadImage(image);
+                              setState(() {
+                                _imageUrlController.text = uploadedUrl;
+                              });
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Cover image uploaded successfully!')),
+                                );
+                              }
+                            } catch (e) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Failed to upload image: $e')),
+                                );
+                              }
+                            }
                           }
                         },
                       ),
-                      const SizedBox(height: 16),
-                      _buildGlassTextField('Ticket Price (₹)', '999', Icons.confirmation_number,
-                          controller: _priceController, keyboardType: TextInputType.number),
-                      const SizedBox(height: 16),
-                      _buildGlassTextField(
-                        'Banner Image URL',
-                        'https://...',
-                        Icons.image,
-                        controller: _imageUrlController,
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.photo_library, color: AppColors.gold),
-                          onPressed: () async {
-                            final ImagePicker picker = ImagePicker();
-                            final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-                            if (image != null) {
-                              try {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Uploading cover image...')),
-                                );
-                                final uploadedUrl = await UploadRepository().uploadImage(image);
-                                setState(() {
-                                  _imageUrlController.text = uploadedUrl;
-                                });
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Cover image uploaded successfully!')),
-                                  );
-                                }
-                              } catch (e) {
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Failed to upload image: $e')),
-                                  );
-                                }
-                              }
-                            }
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildGlassTextField('Description', 'What is this event about?', Icons.description,
-                          controller: _descriptionController, maxLines: 4),
-                      const SizedBox(height: 48),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: _isPublishing
-                            ? const Center(child: CircularProgressIndicator())
-                            : PrimaryButton(text: widget.event != null ? 'Update Event' : 'Publish Event', onPressed: _publish),
-                      ),
-                      const SizedBox(height: 24),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildGlassTextField('Description', 'What is this event about?', Icons.description,
+                        controller: _descriptionController, maxLines: 4),
+                    const SizedBox(height: 48),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: _isPublishing
+                          ? const Center(child: CircularProgressIndicator(color: AppColors.mahogany))
+                          : PrimaryButton(text: widget.event != null ? 'Update Event' : 'Publish Event', onPressed: _publish),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
                 ),
               ),
-      ),
+            ),
     );
   }
 
@@ -353,19 +357,21 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTextStyles.metadata.copyWith(color: AppColors.mahogany)),
+        Text(label, style: AppTextStyles.metadata.copyWith(color: AppColors.mountain, letterSpacing: 1)),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: AppColors.vanilla.withValues(alpha: 0.9),
+            color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white, width: 1.5),
+            border: Border.all(color: AppColors.sand, width: 1),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: value,
               isExpanded: true,
+              dropdownColor: Colors.white,
+              style: AppTextStyles.bodyLarge.copyWith(color: AppColors.mahogany),
               items: items,
               onChanged: onChanged,
             ),
@@ -379,16 +385,16 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTextStyles.metadata.copyWith(color: AppColors.mahogany)),
+        Text(label, style: AppTextStyles.metadata.copyWith(color: AppColors.mountain, letterSpacing: 1)),
         const SizedBox(height: 8),
         GestureDetector(
           onTap: onTap,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
-              color: AppColors.vanilla.withValues(alpha: 0.9),
+              color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white, width: 1.5),
+              border: Border.all(color: AppColors.sand, width: 1),
             ),
             child: Row(
               children: [
@@ -415,32 +421,26 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTextStyles.metadata.copyWith(color: AppColors.mahogany)),
+        Text(label, style: AppTextStyles.metadata.copyWith(color: AppColors.mountain, letterSpacing: 1)),
         const SizedBox(height: 8),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.vanilla.withValues(alpha: 0.9),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white, width: 1.5),
-              ),
-              child: TextField(
-                controller: controller,
-                maxLines: maxLines,
-                keyboardType: keyboardType,
-                style: AppTextStyles.bodyLarge.copyWith(color: AppColors.mahogany),
-                decoration: InputDecoration(
-                  hintText: hint,
-                  hintStyle: AppTextStyles.bodyCopy.copyWith(color: AppColors.mountain.withValues(alpha: 0.5)),
-                  prefixIcon: maxLines == 1 ? Icon(icon, color: AppColors.gold, size: 20) : null,
-                  suffixIcon: suffixIcon,
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                ),
-              ),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.sand, width: 1),
+          ),
+          child: TextField(
+            controller: controller,
+            maxLines: maxLines,
+            keyboardType: keyboardType,
+            style: AppTextStyles.bodyLarge.copyWith(color: AppColors.mahogany),
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: AppTextStyles.bodyCopy.copyWith(color: AppColors.mountain.withValues(alpha: 0.5)),
+              prefixIcon: maxLines == 1 ? Icon(icon, color: AppColors.gold, size: 20) : null,
+              suffixIcon: suffixIcon,
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             ),
           ),
         ),

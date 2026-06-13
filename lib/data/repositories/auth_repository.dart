@@ -91,10 +91,10 @@ class AuthRepository {
     String? profileImageUrl,
   }) async {
     final response = await _dio.patch('/auth/me', data: {
-      if (firstName != null) 'firstName': firstName,
-      if (lastName != null) 'lastName': lastName,
-      if (phoneNumber != null) 'phoneNumber': phoneNumber,
-      if (profileImageUrl != null) 'profileImageUrl': profileImageUrl,
+      'firstName': ?firstName,
+      'lastName': ?lastName,
+      'phoneNumber': ?phoneNumber,
+      'profileImageUrl': ?profileImageUrl,
     });
     return UserModel.fromJson(response.data as Map<String, dynamic>);
   }

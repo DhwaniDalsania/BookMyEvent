@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import '../widgets/layout/luxury_background.dart';
 import 'checkout_screen.dart';
-import '../widgets/buttons/glass_button.dart';
+// import '../widgets/buttons/glass_button.dart'; // Removed GlassButton import
 import '../data/models/event_model.dart';
 import '../data/models/seat_model.dart';
 import '../providers/booking_provider.dart';
@@ -73,20 +72,20 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
         elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.only(left: 16.0, top: 8, bottom: 8),
-          child: GlassButton(
-            icon: Icons.arrow_back,
-            onTap: () => Navigator.pop(context),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back, color: AppColors.mahogany),
+            onPressed: () => Navigator.pop(context),
           ),
         ),
         title: Column(
           children: [
             Text(
               'Select Seats',
-              style: AppTextStyles.heroTitle.copyWith(fontSize: 20, color: Colors.white),
+              style: AppTextStyles.heroTitle.copyWith(fontSize: 20, color: AppColors.mahogany),
             ),
             Text(
               '${widget.ticketCount} Tickets • ${widget.event.title}',
-              style: AppTextStyles.metadata.copyWith(color: AppColors.sand),
+              style: AppTextStyles.metadata.copyWith(color: AppColors.mountain),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -152,7 +151,7 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
                     ],
                   ),
                 ),
-              ).animate().fadeIn().slideY(begin: -0.2),
+              ),
 
               if (seatMap.ticketTiers.isNotEmpty)
                 Padding(
@@ -170,7 +169,7 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
                         ),
                         child: Text(
                           '${tier.name} — ₹${tier.price.toInt()}',
-                          style: AppTextStyles.metadata.copyWith(color: Colors.white),
+                          style: AppTextStyles.metadata.copyWith(color: AppColors.mahogany),
                         ),
                       );
                     }).toList(),
@@ -222,7 +221,7 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
                                   width: 20,
                                   child: Text(
                                     rowLetter,
-                                    style: AppTextStyles.metadata.copyWith(color: AppColors.sand),
+                                    style: AppTextStyles.metadata.copyWith(color: AppColors.mountain),
                                   ),
                                 ),
                                 const SizedBox(width: 8),
@@ -259,7 +258,7 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
           ),
 
           AnimatedPositioned(
-            duration: 400.ms,
+            duration: const Duration(milliseconds: 300),
             curve: Curves.easeOutCubic,
             bottom: _selectedSeats.isEmpty ? -220 : 0,
             left: 0,
@@ -392,7 +391,7 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
           ),
         ),
         const SizedBox(width: 8),
-        Text(text, style: AppTextStyles.metadata.copyWith(color: Colors.white)),
+        Text(text, style: AppTextStyles.metadata.copyWith(color: AppColors.mahogany)),
       ],
     );
   }
@@ -432,7 +431,7 @@ class _SeatDot extends StatelessWidget {
     Widget dot = GestureDetector(
       onTap: isUnavailable ? null : onTap,
       child: AnimatedContainer(
-        duration: 200.ms,
+        duration: const Duration(milliseconds: 200),
         width: 36,
         height: 36,
         decoration: BoxDecoration(
@@ -454,11 +453,7 @@ class _SeatDot extends StatelessWidget {
     );
 
     if (isSelected) {
-      dot = dot.animate(onPlay: (c) => c.repeat(reverse: true)).scale(
-            begin: const Offset(1, 1),
-            end: const Offset(1.1, 1.1),
-            duration: 800.ms,
-          );
+      // Keep static scale for performance in lists/grids
     } else if (isUnavailable) {
       dot = Opacity(opacity: 0.4, child: dot);
     }

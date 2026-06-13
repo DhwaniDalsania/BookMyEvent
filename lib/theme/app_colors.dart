@@ -22,14 +22,14 @@ class AppColors {
   // Mapping to standard names
   static const Color primary = mahogany;
   static const Color secondary = tobacco;
-  
+
   static const Color background = vanilla;
   static const Color surface = sand;
-  
+
   static const Color textPrimary = mahogany;
   static const Color textSecondary = mountain;
   static const Color textOnPrimary = Colors.white;
   static const Color textOnDark = vanilla;
-  
+
   static const Color divider = Color(0x40AAA396); // Mountain with 25% opacity
 }

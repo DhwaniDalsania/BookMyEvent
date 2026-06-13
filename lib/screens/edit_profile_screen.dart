@@ -69,8 +69,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Edit Profile'),
+        title: Text('Edit Profile', style: AppTextStyles.sectionHeader.copyWith(color: AppColors.mahogany, fontWeight: FontWeight.bold)),
         backgroundColor: AppColors.background,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: AppColors.mahogany),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -78,7 +80,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           children: [
             CircleAvatar(
               radius: 50,
-              backgroundColor: AppColors.gold.withValues(alpha: 0.2),
+              backgroundColor: AppColors.gold.withValues(alpha: 0.15),
               child: const Icon(Icons.person, size: 50, color: AppColors.mahogany),
             ),
             const SizedBox(height: 32),
@@ -89,7 +91,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             _buildField(_phoneController, 'Phone Number', Icons.phone, keyboardType: TextInputType.phone),
             const SizedBox(height: 32),
             _isSaving
-                ? const CircularProgressIndicator()
+                ? const CircularProgressIndicator(color: AppColors.mahogany)
                 : PrimaryButton(text: 'Save Changes', onPressed: _save),
           ],
         ),
@@ -109,6 +111,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         filled: true,
         fillColor: Colors.white,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
     );
   }

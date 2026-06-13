@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import '../providers/booking_provider.dart';
 import '../data/models/booking_model.dart';
-import 'dart:ui';
 
 class BookingsScreen extends ConsumerStatefulWidget {
   const BookingsScreen({super.key});
@@ -25,16 +23,10 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background.withValues(alpha: 0.9),
+        backgroundColor: AppColors.background,
         elevation: 0,
-        title: Text('My Tickets', style: AppTextStyles.sectionHeader.copyWith(color: AppColors.mahogany, fontSize: 32)),
+        title: Text('My Tickets', style: AppTextStyles.sectionHeader.copyWith(color: AppColors.mahogany, fontWeight: FontWeight.bold)),
         centerTitle: false,
-        flexibleSpace: ClipRRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(color: Colors.transparent),
-          ),
-        ),
       ),
       body: Column(
         children: [
@@ -62,7 +54,7 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                     child: GestureDetector(
                       onTap: () => setState(() => _isUpcoming = true),
                       child: AnimatedContainer(
-                        duration: 300.ms,
+                        duration: const Duration(milliseconds: 300),
                         decoration: BoxDecoration(
                           color: _isUpcoming ? AppColors.mahogany : Colors.transparent,
                           borderRadius: BorderRadius.circular(21),
@@ -82,7 +74,7 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                     child: GestureDetector(
                       onTap: () => setState(() => _isUpcoming = false),
                       child: AnimatedContainer(
-                        duration: 300.ms,
+                        duration: const Duration(milliseconds: 300),
                         decoration: BoxDecoration(
                           color: !_isUpcoming ? AppColors.mahogany : Colors.transparent,
                           borderRadius: BorderRadius.circular(21),
@@ -118,7 +110,26 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
 
                 if (bookings.isEmpty) {
                   return Center(
-                    child: Text('No bookings found.', style: AppTextStyles.bodyLarge.copyWith(color: AppColors.mountain)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.confirmation_number_outlined, size: 64, color: AppColors.mountain),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No tickets found',
+                            style: AppTextStyles.cardTitle.copyWith(color: AppColors.mahogany, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Your booked events will appear here.",
+                            style: AppTextStyles.bodyCopy.copyWith(color: AppColors.mountain),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
                   );
                 }
 
@@ -129,13 +140,13 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                     final booking = bookings[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 24.0),
-                      child: _buildWalletPass(booking).animate().fadeIn(delay: (100 * index).ms).slideY(begin: 0.1),
+                      child: _buildWalletPass(booking),
                     );
                   },
                 );
               },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, s) => Center(child: Text('Error loading tickets: $e', style: const TextStyle(color: Colors.white))),
+              loading: () => const Center(child: CircularProgressIndicator(color: AppColors.mahogany)),
+              error: (e, s) => Center(child: Text('Error loading tickets: $e', style: AppTextStyles.bodyCopy.copyWith(color: AppColors.mahogany))),
             ),
           ),
         ],

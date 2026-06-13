@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/event_provider.dart';
+import '../providers/navigation_provider.dart';
 import '../data/models/event_model.dart';
 
 import '../theme/app_colors.dart';
@@ -22,9 +22,30 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   final List<String> _trendingSearches = ['Coldplay', 'Stand-up Comedy', 'Music Festivals', 'Arijit Singh'];
   final List<String> _recentSearches = ['Mumbai City FC', 'Lollapalooza', 'Pottery Workshop'];
   String _searchQuery = '';
+  late TextEditingController _searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    final initialQuery = ref.read(searchQueryProvider);
+    _searchController = TextEditingController(text: initialQuery);
+    _searchQuery = initialQuery;
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final providerQuery = ref.watch(searchQueryProvider);
+    if (providerQuery != _searchQuery) {
+      _searchQuery = providerQuery;
+      _searchController.text = providerQuery;
+    }
+
     final searchAsync = _searchQuery.trim().isNotEmpty
         ? ref.watch(searchResultsProvider(_searchQuery))
         : null;
@@ -37,7 +58,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
         icon: const Icon(Icons.tune, color: AppColors.gold, size: 20),
         label: Text('Filters', style: AppTextStyles.button.copyWith(color: AppColors.gold, fontSize: 14)),
         elevation: 8,
-      ).animate().fadeIn(delay: 800.ms).slideY(begin: 1.0),
+      ),
       body: CustomScrollView(
         slivers: [
           // Premium Search Hero
@@ -75,8 +96,12 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                         Text('Experience', style: AppTextStyles.heroTitle.copyWith(fontSize: 32, color: AppColors.gold, height: 1.1)),
                         const SizedBox(height: 24),
                         CustomSearchBar(
+                          controller: _searchController,
                           hintText: 'Search artists, venues, events...',
-                          onChanged: (value) => setState(() => _searchQuery = value),
+                          onChanged: (value) {
+                            setState(() => _searchQuery = value);
+                            ref.read(searchQueryProvider.notifier).state = value;
+                          },
                         ),
                       ],
                     ),
@@ -207,25 +232,34 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: tags.map((tag) => Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(title.contains('Trending') ? Icons.trending_up : Icons.history, color: accentColor, size: 14),
-                  const SizedBox(width: 6),
-                  Text(tag, style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70, fontSize: 13)),
-                ],
+            children: tags.map((tag) => GestureDetector(
+              onTap: () {
+                setState(() {
+                  _searchQuery = tag;
+                  _searchController.text = tag;
+                });
+                ref.read(searchQueryProvider.notifier).state = tag;
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.mountain.withValues(alpha: 0.2)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(title.contains('Trending') ? Icons.trending_up : Icons.history, color: accentColor, size: 14),
+                    const SizedBox(width: 6),
+                    Text(tag, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mahogany, fontSize: 13)),
+                  ],
+                ),
               ),
             )).toList(),
           ),
         ],
-      ).animate().fadeIn().slideY(begin: 0.1),
+      ),
     );
   }
 
@@ -249,7 +283,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
           Text('See All', style: AppTextStyles.button.copyWith(color: AppColors.gold, fontSize: 13)),
         ],
       ),
-    ).animate().fadeIn().slideX(begin: 0.05);
+    );
   }
 
   Widget _buildTrendingCarousel() {
@@ -274,7 +308,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     onTap: () => _navigateToDetails(context, events[index]),
                   ),
                 ),
-              ).animate().fadeIn(delay: (index * 100).ms).slideX(begin: 0.1);
+              );
             },
           ),
         );
@@ -306,7 +340,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     onTap: () => _navigateToDetails(context, events[index]),
                   ),
                 ),
-              ).animate().fadeIn(delay: (index * 100).ms).slideX(begin: 0.1);
+              );
             },
           ),
         );
@@ -339,7 +373,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     onTap: () => _navigateToDetails(context, premiumEvents[index]),
                   ),
                 ),
-              ).animate().fadeIn(delay: (index * 100).ms).slideX(begin: 0.1);
+              );
             },
           ),
         );
@@ -371,7 +405,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                   },
                   imageUrl: categories[index].iconUrl ?? 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=400&auto=format&fit=crop',
                 ),
-              ).animate().fadeIn(delay: (index * 50).ms).slideY(begin: 0.1);
+              );
             },
           ),
         );
@@ -384,27 +418,79 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   void _showFilterSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.vanilla,
+      backgroundColor: AppColors.background,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Quick Filters', style: AppTextStyles.sectionHeader.copyWith(color: AppColors.mahogany)),
-            const SizedBox(height: 16),
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.mountain.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Quick Filters', 
+              style: AppTextStyles.sectionHeader.copyWith(
+                color: AppColors.mahogany,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Browse events by category instantly.',
+              style: AppTextStyles.bodyCopy.copyWith(color: AppColors.mountain),
+            ),
+            const SizedBox(height: 24),
             Wrap(
-              spacing: 8,
+              spacing: 12,
+              runSpacing: 12,
               children: ['Concerts', 'Comedy', 'Sports', 'Festivals', 'Theatre'].map((tag) {
-                return ActionChip(
-                  label: Text(tag),
-                  onPressed: () {
+                final isCurrent = _searchQuery == tag;
+                return GestureDetector(
+                  onTap: () {
                     Navigator.pop(ctx);
-                    setState(() => _searchQuery = tag);
+                    setState(() {
+                      _searchQuery = tag;
+                      _searchController.text = tag;
+                    });
+                    ref.read(searchQueryProvider.notifier).state = tag;
                   },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: isCurrent ? AppColors.mahogany : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isCurrent ? AppColors.mahogany : AppColors.sand,
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.cinematicShadow.withValues(alpha: 0.03),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      tag,
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: isCurrent ? AppColors.gold : AppColors.mahogany,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 );
               }).toList(),
             ),

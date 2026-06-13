@@ -77,7 +77,7 @@ class OrganizerRepository {
       'heroImageUrl': heroImageUrl,
       'status': 'PUBLISHED',
       'isFeatured': isFeatured,
-      if (ticketTiers != null) 'ticketTiers': ticketTiers,
+      'ticketTiers': ?ticketTiers,
     });
     return EventModel.fromJson(response.data as Map<String, dynamic>);
   }
@@ -101,7 +101,7 @@ class OrganizerRepository {
       'startTime': startTime.toUtc().toIso8601String(),
       'endTime': endTime.toUtc().toIso8601String(),
       'heroImageUrl': heroImageUrl,
-      if (ticketTiers != null) 'ticketTiers': ticketTiers,
+      'ticketTiers': ?ticketTiers,
     });
     return EventModel.fromJson(response.data as Map<String, dynamic>);
   }

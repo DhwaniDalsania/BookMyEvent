@@ -3,10 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
-import '../widgets/layout/luxury_background.dart';
 import 'event_details_screen.dart';
 import '../providers/wishlist_provider.dart';
-import 'dart:ui';
 import '../widgets/images/cached_hero_image.dart';
 
 class WishlistScreen extends ConsumerWidget {
@@ -17,118 +15,156 @@ class WishlistScreen extends ConsumerWidget {
     final wishlistAsync = ref.watch(wishlistProvider);
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.background,
         elevation: 0,
-        title: const Text('My Wishlist'),
+        title: Text(
+          'My Wishlist',
+          style: AppTextStyles.sectionHeader.copyWith(
+            color: AppColors.mahogany,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: false,
       ),
-      body: LuxuryBackground(
-        child: wishlistAsync.when(
-          data: (events) {
-            if (events.isEmpty) {
-              return Center(
-                child: Text(
-                  'Your wishlist is empty.',
-                  style: AppTextStyles.cardTitle.copyWith(color: AppColors.mountain),
-                ),
-              );
-            }
-            return ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-              itemCount: events.length,
-              itemBuilder: (context, index) {
-                final event = events[index];
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => EventDetailsScreen(event: event)),
-                    );
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 24.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.cinematicShadow.withValues(alpha: 0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        )
-                      ],
+      body: wishlistAsync.when(
+        data: (events) {
+          if (events.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.favorite_border_outlined, size: 64, color: AppColors.mountain),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Your wishlist is empty',
+                      style: AppTextStyles.cardTitle.copyWith(color: AppColors.mahogany, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(24),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: AppColors.vanilla.withValues(alpha: 0.8),
-                            border: Border.all(color: Colors.white, width: 1.5),
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(16),
-                                child: CachedHeroImage(
-                                  imageUrl: event.heroImageUrl ?? 'https://images.unsplash.com/photo-1540039155732-d68f126d40ee?q=80&w=600&auto=format&fit=crop',
-                                  width: 90,
-                                  height: 90,
-                                  fit: BoxFit.cover,
-                                  fallbackAsset: 'assets/images/placeholder_hero.jpg',
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Expanded(
-                                          child: Text(event.title, style: AppTextStyles.cardTitle.copyWith(color: AppColors.mahogany)),
-                                        ),
-                                        const Icon(Icons.favorite, color: AppColors.mahogany, size: 24),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(event.description, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mountain), maxLines: 1, overflow: TextOverflow.ellipsis,),
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      '${DateFormat('MMM d').format(event.startTime)} • ${event.locationName}',
-                                      style: AppTextStyles.metadata.copyWith(color: AppColors.mountain),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.gold.withValues(alpha: 0.2),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text('₹${event.startingPrice.toInt()} onwards', style: AppTextStyles.metadata.copyWith(color: AppColors.tobacco, fontWeight: FontWeight.bold)),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "Explore events and save your favorites here.",
+                      style: AppTextStyles.bodyCopy.copyWith(color: AppColors.mountain),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+          return ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            itemCount: events.length,
+            itemBuilder: (context, index) {
+              final event = events[index];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => EventDetailsScreen(event: event)),
+                  );
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 16.0),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.cinematicShadow.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      )
+                    ],
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: CachedHeroImage(
+                          imageUrl: event.heroImageUrl ?? '',
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                          fallbackAsset: 'assets/images/placeholder_hero.jpg',
                         ),
                       ),
-                    ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    event.title, 
+                                    style: AppTextStyles.cardTitle.copyWith(
+                                      color: AppColors.mahogany,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const Icon(Icons.favorite, color: AppColors.gold, size: 20),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              event.description, 
+                              style: AppTextStyles.bodyCopy.copyWith(color: AppColors.mountain, fontSize: 13), 
+                              maxLines: 1, 
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    '${DateFormat('MMM d').format(event.startTime)} • ${event.locationName}',
+                                    style: AppTextStyles.metadata.copyWith(color: AppColors.mountain),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.gold.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    '₹${event.startingPrice.toInt()}+', 
+                                    style: AppTextStyles.metadata.copyWith(
+                                      color: AppColors.mahogany, 
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                );
-              },
-            );
-          },
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, s) => Center(child: Text('Error: $e')),
-        ),
+                ),
+              );
+            },
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.mahogany)),
+        error: (e, s) => Center(child: Text('Error: $e', style: AppTextStyles.bodyCopy.copyWith(color: AppColors.mahogany))),
       ),
     );
   }

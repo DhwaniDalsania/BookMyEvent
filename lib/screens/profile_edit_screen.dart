@@ -147,6 +147,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                       });
                       if (context.mounted) Navigator.pop(context);
                     } catch (e) {
+                      if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Failed to upload image: $e')),
                       );

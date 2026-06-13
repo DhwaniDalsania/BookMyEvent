@@ -4,33 +4,40 @@ import '../../theme/app_colors.dart';
 class CustomSearchBar extends StatelessWidget {
   final String hintText;
   final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
+  final TextEditingController? controller;
 
   const CustomSearchBar({
     super.key,
     this.hintText = 'Search experiences...',
     this.onChanged,
+    this.onSubmitted,
+    this.controller,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.vanilla,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(30), // Pill shape
         boxShadow: [
           BoxShadow(
-            color: AppColors.mahogany.withValues(alpha: 0.15), // Warm shadow
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: AppColors.mahogany.withValues(alpha: 0.1), // Warm shadow
+            blurRadius: 15,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: TextField(
+        controller: controller,
         onChanged: onChanged,
-        style: Theme.of(context).textTheme.bodyLarge,
+        onSubmitted: onSubmitted,
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.mahogany),
         decoration: InputDecoration(
           hintText: hintText,
-          fillColor: AppColors.sand.withValues(alpha: 0.5), // Subtle premium fill
+          hintStyle: TextStyle(color: AppColors.mountain.withValues(alpha: 0.7)),
+          fillColor: Colors.white, // Subtle premium fill
           prefixIcon: const Padding(
             padding: EdgeInsets.only(left: 16.0, right: 8.0),
             child: Icon(Icons.search, color: AppColors.mahogany),
@@ -39,7 +46,7 @@ class CustomSearchBar extends StatelessWidget {
           suffixIcon: Container(
             margin: const EdgeInsets.all(8),
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.mahogany,
               shape: BoxShape.circle,
             ),

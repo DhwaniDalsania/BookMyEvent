@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-// font_awesome removed - using Material icons instead
 import 'package:confetti/confetti.dart';
 import 'package:intl/intl.dart';
 import '../theme/app_colors.dart';
@@ -41,7 +39,7 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.cinematicOverlay,
+      backgroundColor: AppColors.background,
       body: Stack(
         children: [
           SafeArea(
@@ -53,26 +51,25 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                 children: [
                   const SizedBox(height: 20),
                   // Title
-                  const Text(
+                  Text(
                     "You're Going!",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'Playfair Display',
+                    style: AppTextStyles.sectionHeader.copyWith(
                       fontSize: 32,
                       color: AppColors.mahogany,
                       fontWeight: FontWeight.bold,
                     ),
-                  ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2),
+                  ),
                   const SizedBox(height: 8),
                   Text(
                     'Your digital ticket is ready.',
                     textAlign: TextAlign.center,
-                    style: AppTextStyles.bodyCopy.copyWith(color: AppColors.sand),
-                  ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.2),
+                    style: AppTextStyles.bodyCopy.copyWith(color: AppColors.mountain),
+                  ),
                   
                   const SizedBox(height: 48),
 
-                  // Glowing Digital Ticket Card strictly bounded
+                  // Digital Ticket Card strictly bounded
                   Center(
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 400),
@@ -83,7 +80,7 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                           borderRadius: BorderRadius.circular(32),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF584738).withValues(alpha: 0.2),
+                              color: const Color(0xFF584738).withValues(alpha: 0.1),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
                             ),
@@ -147,10 +144,10 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                               child: const FittedBox(
                                 child: Icon(Icons.qr_code_2, color: AppColors.mahogany),
                               ),
-                            ).animate().fadeIn(delay: 1000.ms).scale(),
+                            ),
                           ],
                         ),
-                      ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.2),
+                      ),
                     ),
                   ),
 
@@ -179,7 +176,7 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                           ),
                         ),
                       ],
-                    ).animate().fadeIn(delay: 800.ms).slideY(begin: 0.2),
+                    ),
                   ),
                   
                   const SizedBox(height: 32),
@@ -188,8 +185,8 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                     onPressed: () {
                       Navigator.popUntil(context, (route) => route.isFirst);
                     },
-                    child: Text('Back to Home', style: AppTextStyles.button.copyWith(color: AppColors.sand)),
-                  ).animate().fadeIn(delay: 1000.ms),
+                    child: Text('Back to Home', style: AppTextStyles.button.copyWith(color: AppColors.mahogany)),
+                  ),
                 ],
               ),
             ),
@@ -224,7 +221,10 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
         backgroundColor: bgColor,
         foregroundColor: fgColor,
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 4),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: bgColor == Colors.white ? const BorderSide(color: AppColors.sand, width: 1) : BorderSide.none,
+        ),
         elevation: 0,
       ),
       onPressed: () {},

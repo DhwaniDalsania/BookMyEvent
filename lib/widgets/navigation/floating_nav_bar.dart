@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../theme/app_colors.dart';
@@ -17,43 +16,32 @@ class FloatingNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 32),
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      height: 72,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(40),
+        color: AppColors.mahogany,
+        borderRadius: BorderRadius.circular(36),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF150C07).withValues(alpha: 0.25),
-            blurRadius: 30,
-            offset: const Offset(0, 10),
+            color: const Color(0xFF150C07).withValues(alpha: 0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(40),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-          child: Container(
-            height: 72,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF2A201A).withValues(alpha: 0.7),
-              borderRadius: BorderRadius.circular(40),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.15),
-                width: 1.5,
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildNavItem(0, Icons.home_filled, Icons.home_outlined, 'Explore'),
-                _buildNavItem(1, Icons.search, Icons.search_outlined, 'Search'),
-                _buildNavItem(2, Icons.local_activity, Icons.local_activity_outlined, 'Tickets'),
-                _buildNavItem(3, Icons.person, Icons.person_outline, 'Profile'),
-              ],
-            ),
-          ),
+        border: Border.all(
+          color: AppColors.gold.withValues(alpha: 0.2),
+          width: 1,
         ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildNavItem(0, Icons.home_filled, Icons.home_outlined, 'Explore'),
+          _buildNavItem(1, Icons.search, Icons.search_outlined, 'Search'),
+          _buildNavItem(2, Icons.local_activity, Icons.local_activity_outlined, 'Tickets'),
+          _buildNavItem(3, Icons.person, Icons.person_outline, 'Profile'),
+        ],
       ),
     );
   }
